@@ -2,7 +2,6 @@ package com.ufcg.psoft.commerce.dto.entregador;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EntregadorPostPutRequestDTO {
+public class EntregadorGetRequestDTO {
 
     @JsonProperty("nomeCompleto")
     @NotBlank
@@ -29,9 +28,4 @@ public class EntregadorPostPutRequestDTO {
     @JsonProperty("corVeiculo")
     @NotBlank
     private String corVeiculo;
-
-    @JsonProperty("codAcesso")
-    @Pattern(regexp = "\\d{6}")
-    @NotBlank
-    private String codAcesso;
 }
