@@ -13,21 +13,21 @@ import org.springframework.stereotype.Service;
 public class EntregadorPutService implements EntregadorPutInteface {
 
     @Autowired
-    EntregadorRepository entregadorRepository;
+    private EntregadorRepository entregadorRepository;
 
     @Override
     public Entregador update(Long id, EntregadorPostPutRequestDTO data) {
 
-        entregadorRepository.findById(id).map(record -> {
+        this.entregadorRepository.findById(id).map(record -> {
             record.setNomeCompleto(data.getNomeCompleto());
             record.setTipoVeiculo(data.getTipoVeiculo());
             record.setPlacaVeiculo(data.getPlacaVeiculo());
             record.setCorVeiculo(data.getCorVeiculo());
             record.setCodAcesso(data.getCodAcesso());
 
-            return entregadorRepository.save(record);
+            return this.entregadorRepository.save(record);
         }).orElseThrow(InvalidIdException::new);
 
-        return entregadorRepository.getById(id);
+        return this.entregadorRepository.getById(id);
     }
 }

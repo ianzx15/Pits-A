@@ -16,24 +16,24 @@ import java.util.stream.Collectors;
 public class EntregadorGetService implements EntregadorGetServiceInterface {
 
     @Autowired
-    EntregadorRepository entregadorRepository;
+    private EntregadorRepository entregadorRepository;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Override
     public List<EntregadorGetRequestDTO> getAll() {
-        Collection<Entregador> allEntregadores = entregadorRepository.findAll();
+        Collection<Entregador> allEntregadores = this.entregadorRepository.findAll();
         return allEntregadores
                 .stream()
-                .map(entregador -> modelMapper
+                .map(entregador -> this.modelMapper
                         .map(entregador, EntregadorGetRequestDTO.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     public EntregadorGetRequestDTO getById(Long id) {
-        Entregador entregador = entregadorRepository.findById(id).orElseThrow(InvalidIdException::new);
+        Entregador entregador = this.entregadorRepository.findById(id).orElseThrow(InvalidIdException::new);
         return modelMapper.map(entregador, EntregadorGetRequestDTO.class);
     }
 }

@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 public class EntregadorPostService implements EntregadorPostServiceInterface {
 
     @Autowired
-    EntregadorRepository entregadorRepository;
+    private EntregadorRepository entregadorRepository;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Override
     public Entregador cadastrar(EntregadorPostPutRequestDTO data) {
-        return entregadorRepository.save(modelMapper.map(data, Entregador.class));
+        return this.entregadorRepository.save(this.modelMapper.map(data, Entregador.class));
     }
 }

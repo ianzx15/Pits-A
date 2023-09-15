@@ -3,6 +3,7 @@ package com.ufcg.psoft.commerce.controller;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorGetRequestDTO;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
 import com.ufcg.psoft.commerce.model.Entregador;
+import com.ufcg.psoft.commerce.service.entregador.EntregadorDeleteService;
 import com.ufcg.psoft.commerce.service.entregador.interfaces.EntregadorPostServiceInterface;
 import com.ufcg.psoft.commerce.service.entregador.interfaces.EntregadorGetServiceInterface;
 import com.ufcg.psoft.commerce.service.entregador.interfaces.EntregadorPutInteface;
@@ -21,33 +22,44 @@ import java.util.List;
 public class EntregadorController {
 
     @Autowired
-    EntregadorPostServiceInterface entregadorPostServiceInterface;
+    private EntregadorPostServiceInterface entregadorPostServiceInterface;
 
     @Autowired
-    EntregadorGetServiceInterface entregadorGetServiceInterface;
+    private EntregadorGetServiceInterface entregadorGetServiceInterface;
 
     @Autowired
-    EntregadorPutInteface entregadorPutInteface;
+    private EntregadorPutInteface entregadorPutInteface;
+
+    @Autowired
+    private EntregadorDeleteService entregadorDeleteService;
 
     @PostMapping
     @Transactional
     public ResponseEntity<Entregador> cadastra(@RequestBody @Valid EntregadorPostPutRequestDTO data) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(entregadorPostServiceInterface.cadastrar(data));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.entregadorPostServiceInterface.cadastrar(data));
     }
 
     @GetMapping
     public ResponseEntity<List<EntregadorGetRequestDTO>> listAll() {
-        return ResponseEntity.ok(entregadorGetServiceInterface.getAll());
+        return ResponseEntity.ok(this.entregadorGetServiceInterface.getAll());
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<EntregadorGetRequestDTO> listById(@PathVariable Long id) {
-        return ResponseEntity.ok(entregadorGetServiceInterface.getById(id));
+        return ResponseEntity.ok(this.entregadorGetServiceInterface.getById(id));
     }
 
     @PutMapping(value = "/{id}")
     @Transactional
     public ResponseEntity<Entregador> modificaEntregador(@PathVariable Long id, @RequestBody EntregadorPostPutRequestDTO data) {
-        return ResponseEntity.ok(entregadorPutInteface.update(id, data));
+        return ResponseEntity.ok(this.entregadorPutInteface.update(id, data));
     }
+
+    @DeleteMapping(value = "/{id}")
+    @Transactional
+    public ResponseEntity<?> deletaEntregador(@PathVariable Long id) {
+        this.entregadorDeleteService.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Entregador Excluido");
+    }
+
 }
