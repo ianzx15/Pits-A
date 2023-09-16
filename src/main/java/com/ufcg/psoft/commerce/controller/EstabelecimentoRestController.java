@@ -31,14 +31,19 @@ public class EstabelecimentoRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EstabelecimentoResponseDTO> recuperarEstabelecimento(@PathVariable Long id) {
+    public ResponseEntity<EstabelecimentoResponseDTO> recuperarEstabelecimento(
+        @PathVariable Long id,
+        @RequestParam String codigoAcesso
+        ) {
         return ResponseEntity.ok(
                 estabelecimentoServices.recuperarEstabelecimento(id)
         );
     }
 
     @GetMapping
-    public ResponseEntity<List<EstabelecimentoResponseDTO>> recuperarTodosEstabelecimentos() {
+    public ResponseEntity<List<EstabelecimentoResponseDTO>> recuperarTodosEstabelecimentos(
+        @RequestParam String codigoAcesso
+    ) {
         return ResponseEntity.ok(
                 estabelecimentoServices.recuperarTodosEstabelecimentos()
         );
@@ -47,16 +52,20 @@ public class EstabelecimentoRestController {
     @PutMapping("/{id}")
     public ResponseEntity<EstabelecimentoResponseDTO> atualizarEstabelecimento(
             @PathVariable Long id,
+            @RequestParam String codigoAcesso,
             @Valid @RequestBody EstabelecimentoPostPutRequestDTO estabelecimentoPostPutRequestDTO
     ) {
         return ResponseEntity.ok(
-                estabelecimentoServices.atualizarEstabelecimento(id, estabelecimentoPostPutRequestDTO)
+                estabelecimentoServices.atualizarEstabelecimento(codigoAcesso, id, estabelecimentoPostPutRequestDTO)
         );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarEstabelecimento(@PathVariable Long id) {
-        estabelecimentoServices.deletarEstabelecimento(id);
+    public ResponseEntity<Void> deletarEstabelecimento(
+        @PathVariable Long id,
+        @RequestParam String codigoAcesso
+        ) {
+        estabelecimentoServices.deletarEstabelecimento(codigoAcesso, id);
         return ResponseEntity.noContent().build();
     }
 
