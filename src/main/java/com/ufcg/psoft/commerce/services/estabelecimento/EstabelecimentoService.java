@@ -10,8 +10,8 @@ public interface EstabelecimentoService {
     public EstabelecimentoResponseDTO recuperarEstabelecimento(Long id);
     public List<EstabelecimentoResponseDTO> recuperarTodosEstabelecimentos();
     public EstabelecimentoResponseDTO criarEstabelecimento(EstabelecimentoPostPutRequestDTO estabelecimento);
-    public EstabelecimentoResponseDTO atualizarEstabelecimento(Long id, EstabelecimentoPostPutRequestDTO estabelecimento);
-    public void deletarEstabelecimento(Long id);
-    public Boolean existeEstabelecimento(Long id);
+    public EstabelecimentoResponseDTO atualizarEstabelecimento(String codigoAcesso, Long id,  EstabelecimentoPostPutRequestDTO estabelecimento);
+    public void deletarEstabelecimento(String codigoAcesso, Long id);
+    public Boolean existeEstabelecimento(String codigoAcesso, Long id);
 
 }
