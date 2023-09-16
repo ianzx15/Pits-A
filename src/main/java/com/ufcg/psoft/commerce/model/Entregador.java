@@ -20,9 +20,9 @@ public class Entregador {
     @Column(name = "pk_id_entregador")
     private long id;
 
-    @JsonProperty("nomeCompleto")
-    @Column(nullable = false, name = "ent_nome_completo")
-    private String nomeCompleto;
+    @JsonProperty("nome")
+    @Column(nullable = false, name = "ent_nome")
+    private String nome;
 
     @JsonProperty("tipoVeiculo")
     @Column(nullable = false, name = "ent_type_veiculo")
@@ -36,7 +36,7 @@ public class Entregador {
     @Column(nullable = false, name = "ent_color_veiculo")
     private String corVeiculo;
 
-    @JsonProperty("codAcesso")
-    @Column(nullable = false, name = "ent_codAcesso")
-    private String codAcesso;
+    @JsonProperty("codigoAcesso")
+    @Column(nullable = false, name = "ent_codigoAcesso")
+    private String codigoAcesso;
 }

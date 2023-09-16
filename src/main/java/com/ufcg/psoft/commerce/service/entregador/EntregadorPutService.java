@@ -1,6 +1,6 @@
 package com.ufcg.psoft.commerce.service.entregador;
 
-import com.ufcg.psoft.commerce.dto.entregador.EntregadorGetRequestDTO;
+import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
 import com.ufcg.psoft.commerce.exception.InvalidIdException;
 import com.ufcg.psoft.commerce.model.Entregador;
@@ -16,14 +16,15 @@ public class EntregadorPutService implements EntregadorPutInteface {
     private EntregadorRepository entregadorRepository;
 
     @Override
-    public Entregador update(Long id, EntregadorPostPutRequestDTO data) {
+    public Entregador update(Long id, String codAcesso, EntregadorPostPutRequestDTO data) {
 
         this.entregadorRepository.findById(id).map(record -> {
-            record.setNomeCompleto(data.getNomeCompleto());
+            Util.verificaCodAcesso(codAcesso, record.getCodigoAcesso());
+            record.setNome(data.getNome());
             record.setTipoVeiculo(data.getTipoVeiculo());
             record.setPlacaVeiculo(data.getPlacaVeiculo());
             record.setCorVeiculo(data.getCorVeiculo());
-            record.setCodAcesso(data.getCodAcesso());
+            record.setCodigoAcesso(data.getCodigoAcesso());
 
             return this.entregadorRepository.save(record);
         }).orElseThrow(InvalidIdException::new);

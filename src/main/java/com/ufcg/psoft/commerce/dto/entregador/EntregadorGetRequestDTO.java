@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EntregadorGetRequestDTO {
 
-    @JsonProperty("nomeCompleto")
+    @JsonProperty("nome")
     @NotBlank
-    private String nomeCompleto;
+    private String nome;
 
     @JsonProperty("tipoVeiculo")
     @NotBlank

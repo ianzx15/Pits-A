@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EntregadorPostPutRequestDTO {
 
-    @JsonProperty("nomeCompleto")
+    @JsonProperty("nome")
     @NotBlank
-    private String nomeCompleto;
+    private String nome;
 
     @JsonProperty("tipoVeiculo")
     @NotBlank
@@ -30,8 +30,8 @@ public class EntregadorPostPutRequestDTO {
     @NotBlank
     private String corVeiculo;
 
-    @JsonProperty("codAcesso")
+    @JsonProperty("codigoAcesso")
     @Pattern(regexp = "\\d{6}")
     @NotBlank
-    private String codAcesso;
+    private String codigoAcesso;
 }
