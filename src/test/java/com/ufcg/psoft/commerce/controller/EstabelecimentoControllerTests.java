@@ -7,7 +7,7 @@ import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoPostPutRequest
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoResponseDTO;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
-import com.ufcg.psoft.commerce.repositories.EstabelecimentoRepository;
+import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
