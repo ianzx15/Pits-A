@@ -1,4 +1,4 @@
-package com.ufcg.psoft.commerce.repositories;
+package com.ufcg.psoft.commerce.repository;
 
 import com.ufcg.psoft.commerce.model.Entregador;
 import org.springframework.data.jpa.repository.JpaRepository;

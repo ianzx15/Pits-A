@@ -3,7 +3,7 @@ package com.ufcg.psoft.commerce.controller;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorGetRequestDTO;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
 import com.ufcg.psoft.commerce.model.Entregador;
-import com.ufcg.psoft.commerce.services.entregador.EntregadorServicesInterface;
+import com.ufcg.psoft.commerce.service.entregador.EntregadorServicesInterface;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
