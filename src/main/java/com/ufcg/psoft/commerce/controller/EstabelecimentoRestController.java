@@ -2,7 +2,7 @@ package com.ufcg.psoft.commerce.controller;
 
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoResponseDTO;
-import com.ufcg.psoft.commerce.services.estabelecimento.EstabelecimentoServiceImpl;
+import com.ufcg.psoft.commerce.service.estabelecimento.EstabelecimentoServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
