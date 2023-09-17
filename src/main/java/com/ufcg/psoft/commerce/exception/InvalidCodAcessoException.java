@@ -2,6 +2,6 @@ package com.ufcg.psoft.commerce.exception;
 
 public class InvalidCodAcessoException extends CommerceException {
     public InvalidCodAcessoException() {
-        super("Codigo de Acesso Invalido !");
+        super("Codigo de acesso invalido!");
     }
 }
