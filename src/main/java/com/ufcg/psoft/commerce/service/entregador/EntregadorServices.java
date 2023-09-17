@@ -58,7 +58,7 @@ public class EntregadorServices implements EntregadorServicesInterface {
             return this.entregadorRepository.save(record);
         }).orElseThrow(EntregadorNotFoundException::new);
 
-        return this.entregadorRepository.getById(id);
+        return this.entregadorRepository.findById(id).get();
     }
 
     @Override

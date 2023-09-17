@@ -1,8 +1,9 @@
 package com.ufcg.psoft.commerce.service.estabelecimento;
 
+import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoResponseDTO;
-import com.ufcg.psoft.commerce.exception.estabelecimento.CodigoAcessoInvalido;
+import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
 import org.modelmapper.ModelMapper;
@@ -21,10 +22,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     @Autowired
     ModelMapper modelMapper;
 
-    public EstabelecimentoResponseDTO recuperarEstabelecimento(Long id) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Estabelecimento não encontrado!")
-        );
+    public EstabelecimentoResponseDTO recuperarEstabelecimento(String codigoAcesso, Long id) {
+        Estabelecimento estabelecimento = this.getEstabelecimento(codigoAcesso, id);
 
         return modelMapper.map(estabelecimento, EstabelecimentoResponseDTO.class);
     }
@@ -37,23 +36,18 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                 .collect(Collectors.toList());
     }
 
-    public EstabelecimentoResponseDTO criarEstabelecimento(EstabelecimentoPostPutRequestDTO estabelecimentoPostPutRequestDTO) {
-            Estabelecimento estabelecimento = this.estabelecimentoRepository.save(
-                Estabelecimento.builder().codigoAcesso(estabelecimentoPostPutRequestDTO.getCodigoAcesso()).build()
-            );
+    public EstabelecimentoResponseDTO criarEstabelecimento(
+            EstabelecimentoPostPutRequestDTO estabelecimentoPostPutRequestDTO) {
+        Estabelecimento estabelecimento = this.estabelecimentoRepository.save(
+                Estabelecimento.builder().codigoAcesso(estabelecimentoPostPutRequestDTO.getCodigoAcesso()).build());
 
-            EstabelecimentoResponseDTO est = modelMapper.map(estabelecimento, EstabelecimentoResponseDTO.class);
-            return est;
+        EstabelecimentoResponseDTO est = modelMapper.map(estabelecimento, EstabelecimentoResponseDTO.class);
+        return est;
     }
 
-    public EstabelecimentoResponseDTO atualizarEstabelecimento(String codigoAcesso, Long id, EstabelecimentoPostPutRequestDTO estabelecimentoPostPutRequestDTO) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Estabelecimento não encontrado!")
-        );
-
-        if (estabelecimento.getCodigoAcesso() == codigoAcesso) {
-            throw new CodigoAcessoInvalido("Codigo de acesso Invalido");
-        }
+    public EstabelecimentoResponseDTO atualizarEstabelecimento(String codigoAcesso, Long id,
+            EstabelecimentoPostPutRequestDTO estabelecimentoPostPutRequestDTO) {
+        Estabelecimento estabelecimento = this.getEstabelecimento(codigoAcesso, id);
 
         estabelecimento.setCodigoAcesso(estabelecimentoPostPutRequestDTO.getCodigoAcesso());
 
@@ -63,28 +57,18 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     public void deletarEstabelecimento(String codigoAcesso, Long id) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Estabelecimento não encontrado!")
-        );
-
-        if (estabelecimento.getCodigoAcesso() == codigoAcesso) {
-            throw new CodigoAcessoInvalido("Codigo de acesso Invalido");
-        }
+        Estabelecimento estabelecimento = this.getEstabelecimento(codigoAcesso, id);
 
         this.estabelecimentoRepository.deleteById(estabelecimento.getId());
     }
 
-    public Boolean existeEstabelecimento(String codigoAcesso, Long id) {
-         Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Estabelecimento não encontrado!")
-        );
+    public Estabelecimento getEstabelecimento(String codigoAcesso, Long id) {
+        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
+                .orElseThrow(EstabelecimentoNaoEncontrado::new);
 
-        if (estabelecimento.getCodigoAcesso() == codigoAcesso) {
-            throw new CodigoAcessoInvalido("Codigo de acesso Invalido");
-        }
+        Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
-
-        return this.estabelecimentoRepository.existsById(id);
+        return estabelecimento;
     }
 
 }
