@@ -1,7 +1,9 @@
 package com.ufcg.psoft.commerce.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ufcg.psoft.commerce.notations.ValidadorVeiculo;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,18 +23,23 @@ public class Entregador {
     private long id;
 
     @JsonProperty("nome")
+    @NotBlank(message = "Nome e obrigatorio")
     @Column(nullable = false, name = "ent_nome")
     private String nome;
 
     @JsonProperty("tipoVeiculo")
+    @NotBlank(message = "Tipo do veiculo e obrigatorio")
+    @ValidadorVeiculo
     @Column(nullable = false, name = "ent_type_veiculo")
     private String tipoVeiculo;
 
     @JsonProperty("placaVeiculo")
+    @NotBlank(message = "Placa do veiculo e obrigatoria")
     @Column(nullable = false, name = "ent_placa_veiculo")
     private String placaVeiculo;
 
     @JsonProperty("corVeiculo")
+    @NotBlank(message = "Cor do veiculo e obrigatoria")
     @Column(nullable = false, name = "ent_color_veiculo")
     private String corVeiculo;
 

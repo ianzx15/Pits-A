@@ -39,15 +39,14 @@ public class EntregadorController {
 
     @PutMapping(value = "/{id}")
     @Transactional
-    public ResponseEntity<Entregador> modificaEntregador(@PathVariable Long id, @RequestParam String codAcesso, @RequestBody EntregadorPostPutRequestDTO data) {
-        return ResponseEntity.ok(this.entregadorServices.update(id, codAcesso, data));
+    public ResponseEntity<Entregador> modificaEntregador(@PathVariable Long id, @RequestParam String codigoAcesso, @RequestBody EntregadorPostPutRequestDTO data) {
+        return ResponseEntity.ok(this.entregadorServices.update(id, codigoAcesso, data));
     }
 
     @DeleteMapping(value = "/{id}")
     @Transactional
-    public ResponseEntity<?> deletaEntregador(@PathVariable Long id, @RequestParam String codAcesso) {
-        this.entregadorServices.delete(id, codAcesso);
+    public ResponseEntity<?> deletaEntregador(@PathVariable Long id, @RequestParam String codigoAcesso) {
+        this.entregadorServices.delete(id, codigoAcesso);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Entregador Excluido");
     }
-
 }

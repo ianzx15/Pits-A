@@ -45,10 +45,10 @@ public class EntregadorServices implements EntregadorServicesInterface {
     }
 
     @Override
-    public Entregador update(Long id, String codAcesso, EntregadorPostPutRequestDTO data) {
+    public Entregador update(Long id, String codigoAcesso, EntregadorPostPutRequestDTO data) {
 
         this.entregadorRepository.findById(id).map(record -> {
-            Util.verificaCodAcesso(codAcesso, record.getCodigoAcesso());
+            Util.verificaCodAcesso(codigoAcesso, record.getCodigoAcesso());
             record.setNome(data.getNome());
             record.setTipoVeiculo(data.getTipoVeiculo());
             record.setPlacaVeiculo(data.getPlacaVeiculo());
@@ -62,9 +62,9 @@ public class EntregadorServices implements EntregadorServicesInterface {
     }
 
     @Override
-    public void delete(Long id, String codAcesso) {
+    public void delete(Long id, String codigoAcesso) {
         Entregador entity = this.entregadorRepository.findById(id).orElseThrow(EntregadorNotFoundException::new);
-        Util.verificaCodAcesso(codAcesso, entity.getCodigoAcesso());
+        Util.verificaCodAcesso(codigoAcesso, entity.getCodigoAcesso());
         this.entregadorRepository.deleteById(id);
     }
 }

@@ -10,6 +10,6 @@ public interface EntregadorServicesInterface {
     public Entregador cadastrar(EntregadorPostPutRequestDTO data);
     public List<EntregadorGetRequestDTO> getAll();
     public EntregadorGetRequestDTO getById(Long id);
-    public Entregador update(Long id, String codAcesso, EntregadorPostPutRequestDTO data);
-    public void delete(Long id, String codAcesso);
+    public Entregador update(Long id, String codigoAcesso, EntregadorPostPutRequestDTO data);
+    public void delete(Long id, String codigoAcesso);
 }
