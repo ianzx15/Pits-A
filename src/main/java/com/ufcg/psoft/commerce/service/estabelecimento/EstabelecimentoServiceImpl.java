@@ -21,10 +21,8 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     @Autowired
     ModelMapper modelMapper;
 
-    public EstabelecimentoResponseDTO recuperarEstabelecimento(Long id) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Estabelecimento não encontrado!")
-        );
+    public EstabelecimentoResponseDTO recuperarEstabelecimento(String codigoAcesso, Long id) {
+        Estabelecimento estabelecimento = this.getEstabelecimento(codigoAcesso, id);
 
         return modelMapper.map(estabelecimento, EstabelecimentoResponseDTO.class);
     }
@@ -47,13 +45,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     public EstabelecimentoResponseDTO atualizarEstabelecimento(String codigoAcesso, Long id, EstabelecimentoPostPutRequestDTO estabelecimentoPostPutRequestDTO) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Estabelecimento não encontrado!")
-        );
-
-        if (estabelecimento.getCodigoAcesso() == codigoAcesso) {
-            throw new CodigoAcessoInvalido("Codigo de acesso Invalido");
-        }
+        Estabelecimento estabelecimento = this.getEstabelecimento(codigoAcesso, id);
 
         estabelecimento.setCodigoAcesso(estabelecimentoPostPutRequestDTO.getCodigoAcesso());
 
@@ -63,18 +55,12 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     public void deletarEstabelecimento(String codigoAcesso, Long id) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Estabelecimento não encontrado!")
-        );
-
-        if (estabelecimento.getCodigoAcesso() == codigoAcesso) {
-            throw new CodigoAcessoInvalido("Codigo de acesso Invalido");
-        }
+        Estabelecimento estabelecimento = this.getEstabelecimento(codigoAcesso, id);
 
         this.estabelecimentoRepository.deleteById(estabelecimento.getId());
     }
 
-    public Boolean existeEstabelecimento(String codigoAcesso, Long id) {
+    public Estabelecimento getEstabelecimento(String codigoAcesso, Long id) {
          Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Estabelecimento não encontrado!")
         );
@@ -83,8 +69,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
             throw new CodigoAcessoInvalido("Codigo de acesso Invalido");
         }
 
-
-        return this.estabelecimentoRepository.existsById(id);
+        return estabelecimento;
     }
 
 }

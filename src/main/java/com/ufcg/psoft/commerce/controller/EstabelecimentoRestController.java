@@ -36,7 +36,7 @@ public class EstabelecimentoRestController {
         @RequestParam String codigoAcesso
         ) {
         return ResponseEntity.ok(
-                estabelecimentoServices.recuperarEstabelecimento(id)
+                estabelecimentoServices.recuperarEstabelecimento(codigoAcesso, id)
         );
     }
 
