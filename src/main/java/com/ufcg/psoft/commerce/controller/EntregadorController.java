@@ -39,7 +39,7 @@ public class EntregadorController {
 
     @PutMapping(value = "/{id}")
     @Transactional
-    public ResponseEntity<Entregador> modificaEntregador(@PathVariable Long id, @RequestParam String codigoAcesso, @RequestBody EntregadorPostPutRequestDTO data) {
+    public ResponseEntity<Entregador> modificaEntregador(@PathVariable Long id, @RequestParam String codigoAcesso, @RequestBody @Valid EntregadorPostPutRequestDTO data) {
         return ResponseEntity.ok(this.entregadorServices.update(id, codigoAcesso, data));
     }
 

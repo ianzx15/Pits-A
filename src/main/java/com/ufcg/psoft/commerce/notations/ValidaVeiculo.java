@@ -1,9 +1,10 @@
 package com.ufcg.psoft.commerce.notations;
 
+import com.ufcg.psoft.commerce.exception.CommerceException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class ValidaVeiculo implements ConstraintValidator<ValidadorVeiculo, String>{
+public class ValidaVeiculo implements ConstraintValidator<ValidadorVeiculo, String> {
 
     @Override
     public void initialize(ValidadorVeiculo constraintAnnotation) {
@@ -14,9 +15,7 @@ public class ValidaVeiculo implements ConstraintValidator<ValidadorVeiculo, Stri
     public boolean isValid(String tipoVeiculo, ConstraintValidatorContext context) {
         if (tipoVeiculo != null) {
             var generic = tipoVeiculo.toUpperCase();
-            if (generic.equals("MOTO") || generic.equals("CARRO")) {
-                return true;
-            }
+            return generic.equals("MOTO") || generic.equals("CARRO");
         }
         return false;
     }
