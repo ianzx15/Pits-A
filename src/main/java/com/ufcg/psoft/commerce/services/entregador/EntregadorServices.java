@@ -1,11 +1,11 @@
-package com.ufcg.psoft.commerce.service.entregador;
+package com.ufcg.psoft.commerce.services.entregador;
 
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorGetRequestDTO;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
 import com.ufcg.psoft.commerce.exception.EntregadorNotFoundException;
 import com.ufcg.psoft.commerce.model.Entregador;
-import com.ufcg.psoft.commerce.repository.EntregadorRepository;
+import com.ufcg.psoft.commerce.repositories.EntregadorRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
