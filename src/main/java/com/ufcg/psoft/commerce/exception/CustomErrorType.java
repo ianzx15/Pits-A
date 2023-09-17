@@ -26,5 +26,5 @@ public class CustomErrorType {
         this.message = e.getMessage();
         this.errors = new ArrayList<>();
     }
-
 }
+
