@@ -4,7 +4,7 @@ import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoPostPutRequest
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoResponseDTO;
 import com.ufcg.psoft.commerce.exception.estabelecimento.CodigoAcessoInvalido;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
-import com.ufcg.psoft.commerce.repositories.EstabelecimentoRepository;
+import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
