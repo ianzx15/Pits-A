@@ -1,4 +1,4 @@
-package com.ufcg.psoft.commerce.service;
+package com.ufcg.psoft.commerce.service.cliente;
 
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.ClientePostPutRequestDTO;
