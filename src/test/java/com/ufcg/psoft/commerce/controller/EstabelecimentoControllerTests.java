@@ -10,6 +10,8 @@ import com.ufcg.psoft.commerce.exception.CustomErrorType;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.model.Sabor;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
+import com.ufcg.psoft.commerce.repository.SaborRepository;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,6 +37,9 @@ public class EstabelecimentoControllerTests {
     @Autowired
     EstabelecimentoRepository estabelecimentoRepository;
 
+    @Autowired
+    SaborRepository saborRepository;
+
     ObjectMapper objectMapper = new ObjectMapper();
 
     Estabelecimento estabelecimento;
@@ -50,6 +55,7 @@ public class EstabelecimentoControllerTests {
     @AfterEach
     void tearDown() {
         estabelecimentoRepository.deleteAll();
+        saborRepository.deleteAll();
     }
 
     @Nested
@@ -193,12 +199,17 @@ public class EstabelecimentoControllerTests {
         @DisplayName("Quando buscamos o cardapio de um estabelecimento")
         void quandoBuscarCardapioEstabelecimento() throws Exception {
             // Arrange
+            Estabelecimento estabelecimento1 = Estabelecimento.builder()
+                    .codigoAcesso("123456")
+                    .build();
+            estabelecimentoRepository.save(estabelecimento1);
             Sabor sabor1 = Sabor.builder()
                     .nome("Calabresa")
                     .precoM(25.0)
                     .precoG(35.0)
                     .tipo("salgado")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
 
             Sabor sabor2 = Sabor.builder()
@@ -207,6 +218,7 @@ public class EstabelecimentoControllerTests {
                     .precoG(30.0)
                     .tipo("salgado")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
             Sabor sabor3 = Sabor.builder()
                     .nome("Chocolate")
@@ -214,6 +226,7 @@ public class EstabelecimentoControllerTests {
                     .precoG(35.0)
                     .tipo("doce")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
 
             Sabor sabor4 = Sabor.builder()
@@ -222,14 +235,12 @@ public class EstabelecimentoControllerTests {
                     .precoG(30.0)
                     .tipo("doce")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
-            Estabelecimento estabelecimento1 = Estabelecimento.builder()
-                    .codigoAcesso("123456")
-                    .sabores(Arrays.asList(sabor1, sabor2, sabor3, sabor4))
-                    .build();
-            estabelecimentoRepository.save(estabelecimento1);
-
+            
+            saborRepository.saveAll(Arrays.asList(sabor1, sabor2, sabor3, sabor4));
             // Act
+
             String responseJsonString = driver.perform(get(URI_ESTABELECIMENTOS + "/" +
                     estabelecimento1.getId() + "/sabores")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -276,12 +287,17 @@ public class EstabelecimentoControllerTests {
         void quandoBuscarCardapioEstabelecimentoPorTipo()
                 throws Exception {
             // Arrange
+            Estabelecimento estabelecimento1 = Estabelecimento.builder()
+                    .codigoAcesso("123456")
+                    .build();
+            estabelecimentoRepository.save(estabelecimento1);
             Sabor sabor1 = Sabor.builder()
                     .nome("Calabresa")
                     .precoM(25.0)
                     .precoG(35.0)
                     .tipo("salgado")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
 
             Sabor sabor2 = Sabor.builder()
@@ -290,6 +306,7 @@ public class EstabelecimentoControllerTests {
                     .precoG(30.0)
                     .tipo("salgado")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
             Sabor sabor3 = Sabor.builder()
                     .nome("Chocolate")
@@ -297,6 +314,7 @@ public class EstabelecimentoControllerTests {
                     .precoG(35.0)
                     .tipo("doce")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
 
             Sabor sabor4 = Sabor.builder()
@@ -305,12 +323,10 @@ public class EstabelecimentoControllerTests {
                     .precoG(30.0)
                     .tipo("doce")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
-            Estabelecimento estabelecimento1 = Estabelecimento.builder()
-                    .codigoAcesso("123456")
-                    .sabores(Arrays.asList(sabor1, sabor2, sabor3, sabor4))
-                    .build();
-            estabelecimentoRepository.save(estabelecimento1);
+            
+            saborRepository.saveAll(Arrays.asList(sabor1, sabor2, sabor3, sabor4));
 
             // Act
             String responseJsonString = driver.perform(get(URI_ESTABELECIMENTOS + "/" +
@@ -336,12 +352,18 @@ public class EstabelecimentoControllerTests {
         void quandoBuscarCardapioEstabelecimentoPorTipoDoce()
                 throws Exception {
             // Arrange
+             Estabelecimento estabelecimento1 = Estabelecimento.builder()
+                    .codigoAcesso("123456")
+                    .build();
+            estabelecimentoRepository.save(estabelecimento1);
+
             Sabor sabor1 = Sabor.builder()
                     .nome("Calabresa")
                     .precoM(25.0)
                     .precoG(35.0)
                     .tipo("salgado")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
 
             Sabor sabor2 = Sabor.builder()
@@ -350,6 +372,7 @@ public class EstabelecimentoControllerTests {
                     .precoG(30.0)
                     .tipo("salgado")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
             Sabor sabor3 = Sabor.builder()
                     .nome("Chocolate")
@@ -357,6 +380,7 @@ public class EstabelecimentoControllerTests {
                     .precoG(35.0)
                     .tipo("doce")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
 
             Sabor sabor4 = Sabor.builder()
@@ -365,13 +389,11 @@ public class EstabelecimentoControllerTests {
                     .precoG(30.0)
                     .tipo("doce")
                     .disponivel(true)
+                    .estabelecimento(estabelecimento1)
                     .build();
-            Estabelecimento estabelecimento1 = Estabelecimento.builder()
-                    .codigoAcesso("123456")
-                    .sabores(Arrays.asList(sabor1, sabor2, sabor3, sabor4))
-                    .build();
-            estabelecimentoRepository.save(estabelecimento1);
-
+           
+            saborRepository.saveAll(Arrays.asList(sabor1, sabor2, sabor3, sabor4));
+            
             // Act
             String responseJsonString = driver.perform(get(URI_ESTABELECIMENTOS + "/" +
                     estabelecimento1.getId() + "/sabores" + "/tipo")

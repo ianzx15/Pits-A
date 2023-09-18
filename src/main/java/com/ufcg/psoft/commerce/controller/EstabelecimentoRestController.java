@@ -2,6 +2,7 @@ package com.ufcg.psoft.commerce.controller;
 
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoResponseDTO;
+import com.ufcg.psoft.commerce.dto.sabor.SaborCardapioDTO;
 import com.ufcg.psoft.commerce.service.estabelecimento.EstabelecimentoServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +70,22 @@ public class EstabelecimentoRestController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/sabores")
+    public ResponseEntity<List<SaborCardapioDTO>> recuperarSaboresEstabelecimento(
+        @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(
+                estabelecimentoServices.getCardapio(id)
+        );
+    }
 
+    @GetMapping("/{id}/sabores/tipo")
+    public ResponseEntity<List<SaborCardapioDTO>> recuperarSaboresEstabelecimentoPorTipo(
+        @PathVariable Long id,
+        @RequestParam String tipo
+    ) {
+        return ResponseEntity.ok(
+                estabelecimentoServices.getCardapioPorTipo(id, tipo)
+        );
+    }
 }
