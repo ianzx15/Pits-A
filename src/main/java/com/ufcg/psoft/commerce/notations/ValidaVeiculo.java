@@ -1,6 +1,5 @@
 package com.ufcg.psoft.commerce.notations;
 
-import com.ufcg.psoft.commerce.exception.CommerceException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
