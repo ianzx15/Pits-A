@@ -1,6 +1,6 @@
 package com.ufcg.psoft.commerce.controller;
 
-import com.ufcg.psoft.commerce.dto.ClientePostPutRequestDTO;
+import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
 import com.ufcg.psoft.commerce.service.cliente.ClienteServiceImpl;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
