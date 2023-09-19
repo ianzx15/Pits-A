@@ -20,7 +20,6 @@ public class EntregadorPostPutRequestDTO {
     private String nome;
 
     @JsonProperty("tipoVeiculo")
-    @NotBlank(message = "Tipo do veiculo e obrigatorio")
     @ValidadorVeiculo
     private String tipoVeiculo;
 

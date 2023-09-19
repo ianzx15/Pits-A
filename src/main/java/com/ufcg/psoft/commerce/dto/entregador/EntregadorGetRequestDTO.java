@@ -16,7 +16,7 @@ public class EntregadorGetRequestDTO {
 
     @JsonProperty("id")
     @NotBlank
-    private long id;
+    private Long id;
 
     @JsonProperty("nome")
     @NotBlank

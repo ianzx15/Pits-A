@@ -1,5 +1,8 @@
 package com.ufcg.psoft.commerce.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.notations.ValidadorVeiculo;
 import jakarta.persistence.*;
@@ -20,7 +23,7 @@ public class Entregador {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "pk_id_entregador")
-    private long id;
+    private Long id;
 
     @JsonProperty("nome")
     @NotBlank(message = "Nome e obrigatorio")
@@ -46,4 +49,8 @@ public class Entregador {
     @JsonProperty("codigoAcesso")
     @Column(nullable = false, name = "ent_codigoAcesso")
     private String codigoAcesso;
+
+    @OneToMany(mappedBy = "entregador", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Associacao> associacoes;
 }
