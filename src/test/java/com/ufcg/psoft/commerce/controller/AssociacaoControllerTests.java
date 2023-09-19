@@ -2,7 +2,15 @@ package com.ufcg.psoft.commerce.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ufcg.psoft.commerce.service.entregador.EntregadorService;
+import com.ufcg.psoft.commerce.exception.CustomErrorType;
+import com.ufcg.psoft.commerce.model.Associacao;
+import com.ufcg.psoft.commerce.model.Entregador;
+import com.ufcg.psoft.commerce.model.Estabelecimento;
+import com.ufcg.psoft.commerce.repository.AssociacaoRepository;
+import com.ufcg.psoft.commerce.repository.EntregadorRepository;
+import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
+import com.ufcg.psoft.commerce.service.entregador.EntregadorServices;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,7 +41,7 @@ class AssociacaoControllerTests {
     EntregadorRepository entregadorRepository;
 
     @Autowired
-    EntregadorService entregadorService;
+    EntregadorServices entregadorService;
 
     @Autowired
     EstabelecimentoRepository estabelecimentoRepository;
@@ -80,7 +88,6 @@ class AssociacaoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(post(URI_ASSOCIACAO)
-                            .contentType(MediaType.APPLICATION_JSON)
                             .param("entregadorId", entregador.getId().toString())
                             .param("codigoAcesso", entregador.getCodigoAcesso())
                             .param("estabelecimentoId", estabelecimento.getId().toString()))
@@ -88,14 +95,14 @@ class AssociacaoControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Associacao resultado = objectMapper.readValue(responseJsonString, Associacao.AssociacaoBuilder.class).build();
+            Associacao resultado = objectMapper.readValue(responseJsonString, Associacao.class);
 
             // Assert
             assertAll(
                     () -> assertEquals(1, associacaoRepository.count()),
                     () -> assertNotNull(resultado.getId()),
-                    () -> assertEquals(entregador.getId(), resultado.getEntregadorId()),
-                    () -> assertEquals(estabelecimento.getId(), resultado.getEstabelecimentoId())
+                    () -> assertEquals(entregador.getId(), resultado.getEntregador().getId()),
+                    () -> assertEquals(estabelecimento.getId(), resultado.getEstabelecimento().getId())
             );
         }
 
@@ -179,8 +186,8 @@ class AssociacaoControllerTests {
         @BeforeEach
         void setUp() {
             associacaoRepository.save(Associacao.builder()
-                    .entregadorId(entregador.getId())
-                    .estabelecimentoId(estabelecimento.getId())
+                    .entregador(entregador)
+                    .estabelecimento(estabelecimento)
                     .status(false)
                     .build()
             );
@@ -201,12 +208,12 @@ class AssociacaoControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Associacao resultado = objectMapper.readValue(responseJsonString, Associacao.AssociacaoBuilder.class).build();
+            Associacao resultado = objectMapper.readValue(responseJsonString, Associacao.class);
 
             // Assert
             assertAll(
                     () -> assertEquals(1, associacaoRepository.count()),
-                    () -> assertTrue(resultado.isStatus())
+                    () -> assertTrue(resultado.getStatus())
             );
         }
 
