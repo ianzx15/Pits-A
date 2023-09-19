@@ -1,5 +1,4 @@
-package com.ufcg.psoft.commerce.dto;
-
+package com.ufcg.psoft.commerce.dto.cliente;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -11,9 +10,13 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ClientePostPutRequestDTO {
+@NoArgsConstructor
+public class ClienteGetRequestDTO {
+
+    @JsonProperty("id")
+    @NotBlank
+    private Long id;
 
     @JsonProperty("codigoAcesso")
     @NotBlank(message = "Codigo de acesso obrigatorio")

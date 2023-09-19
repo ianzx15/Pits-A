@@ -1,4 +1,4 @@
-package com.ufcg.psoft.commerce.dto;
+package com.ufcg.psoft.commerce.dto.cliente;
 
 import com.ufcg.psoft.commerce.exception.CommerceException;
 

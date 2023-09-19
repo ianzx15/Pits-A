@@ -3,8 +3,10 @@ package com.ufcg.psoft.commerce.service.estabelecimento;
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoResponseDTO;
+import com.ufcg.psoft.commerce.dto.sabor.SaborCardapioDTO;
 import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
+import com.ufcg.psoft.commerce.model.Sabor;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,5 +72,26 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
         return estabelecimento;
     }
+
+    public List<SaborCardapioDTO> getCardapio(Long id) {
+        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
+                .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        List<Sabor> sabores = estabelecimento.getSabores();
+
+        return sabores.stream().map(sabor -> 
+            modelMapper.map(sabor, SaborCardapioDTO.class)
+          ).toList();
+    }
+
+    public List<SaborCardapioDTO> getCardapioPorTipo(Long id, String tipo) {
+        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
+                .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        List<Sabor> sabores = estabelecimento.getSabores();
+
+        return sabores.stream()
+                    .filter(sabor -> sabor.getTipo().equals(tipo))
+                    .map(sabor -> modelMapper.map(sabor, SaborCardapioDTO.class))
+                    .collect(Collectors.toList());
+    }   
 
 }

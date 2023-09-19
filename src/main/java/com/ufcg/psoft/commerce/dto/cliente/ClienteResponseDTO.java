@@ -1,4 +1,4 @@
-package com.ufcg.psoft.commerce.dto;
+package com.ufcg.psoft.commerce.dto.cliente;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
