@@ -1,15 +1,13 @@
 package com.ufcg.psoft.commerce.service.associacao;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ufcg.psoft.commerce.Util.Util;
-import com.ufcg.psoft.commerce.exception.EntregadorNotFoundException;
+import com.ufcg.psoft.commerce.exception.entregador.EntregadorNotFoundException;
 import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Associacao;
-import com.ufcg.psoft.commerce.model.AssociacaoKey;
 import com.ufcg.psoft.commerce.model.Entregador;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.repository.AssociacaoRepository;
@@ -50,7 +48,7 @@ public class AssociacaoServiceImpl implements AssociacaoService {
         Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
             .orElseThrow(EstabelecimentoNaoEncontrado::new);
             
-        Entregador entregador = entregadorRepository.findById(entregadorId)
+        entregadorRepository.findById(entregadorId)
             .orElseThrow(EntregadorNotFoundException::new);
         Util.verificaCodAcesso(estabelecimentoCodigoAcesso, estabelecimento.getCodigoAcesso());
         
