@@ -22,4 +22,6 @@ public class SaborCardapioDTO {
     @JsonProperty("precoG")
     private Double precoG;
 
+    @JsonProperty("disponivel")
+    private Boolean disponivel;
 }
