@@ -412,5 +412,6 @@ public class EstabelecimentoControllerTests {
             assertAll(
                     () -> assertEquals(2, resultado.size()));
         }
+
     }
 }
