@@ -52,6 +52,7 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
 
+
     public Collection<ClienteResponseDTO> getAll() {
         Collection<Cliente> allClientes = clienteRepository.findAll();
         return allClientes

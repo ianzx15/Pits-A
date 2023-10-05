@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,9 +24,6 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
     @Autowired
     private EstabelecimentoRepository estabelecimentoRepository;
-
-    @Autowired
-    private SaborRepository saborRepository;
 
     @Autowired
     ModelMapper modelMapper;
@@ -79,15 +77,15 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         return estabelecimento;
     }
 
+
     public List<SaborCardapioDTO> getCardapio(Long id) {
         Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
                 .orElseThrow(EstabelecimentoNaoEncontrado::new);
 
-        List<Sabor> sabores = this.saborRepository.findAll(Sort.by(Sort.Direction.DESC, "disponivel"));
-
-        return sabores.stream()
-                .filter(sabor -> sabor.getEstabelecimento().getId().equals(id))
-                .map(sabor -> modelMapper.map(sabor, SaborCardapioDTO.class)).collect(Collectors.toList());
+        estabelecimento.getSabores().sort(Comparator.comparing(Sabor::getDisponivel).reversed());
+        List<Sabor> sabores = estabelecimento.getSabores();
+        return sabores.stream().map(sabor -> modelMapper.map(sabor, SaborCardapioDTO.class))
+                .collect(Collectors.toList());
     }
 
     public List<SaborCardapioDTO> getCardapioPorTipo(Long id, String tipo) {
