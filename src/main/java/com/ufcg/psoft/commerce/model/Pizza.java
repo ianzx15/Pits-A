@@ -1,11 +1,13 @@
 package com.ufcg.psoft.commerce.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,16 +18,19 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity(name = "pizza")
 public class Pizza {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "sabor1")
+    @OneToOne
+    @PrimaryKeyJoinColumn
     private Sabor sabor1;
 
-    @Column(name = "sabor2", nullable = true)
+    @OneToOne
+    @PrimaryKeyJoinColumn
     private Sabor sabor2;
 
     @Column(name = "tamanho")
@@ -34,5 +39,19 @@ public class Pizza {
     @ManyToOne(fetch = FetchType.LAZY)
     @PrimaryKeyJoinColumn
     private Pedido pedido;
+
+    public Double calculaSubTotal() {
+        Double valor = 0.0;
+        if (tamanho.equals("media")) {
+            valor += sabor1.getPrecoM();
+        } else if (tamanho.equals("grande")) {
+            valor += sabor1.getPrecoG();
+            if (sabor2 != null) {
+                valor += sabor2.getPrecoG();
+                valor /= 2;
+            }
+        }
+        return valor;
+    }
     
 }

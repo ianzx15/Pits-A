@@ -1,6 +1,7 @@
 package com.ufcg.psoft.commerce.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +27,7 @@ public class PedidoRestController {
     @PostMapping
     ResponseEntity<PedidoResponseDTO> criar(@RequestParam Long clienteId, @RequestParam String clienteCodigoAcesso,
             @RequestParam Long estabelecimentoId, @Valid @RequestBody PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
-        return ResponseEntity.created(null)
+        return ResponseEntity.status(HttpStatus.CREATED)
             .body(pedidoService.criar(clienteId, clienteCodigoAcesso, estabelecimentoId, pedidoPostPutRequestDTO));
     } 
     
