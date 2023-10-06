@@ -5,12 +5,14 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
+import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.model.Pedido;
 import com.ufcg.psoft.commerce.model.Pizza;
@@ -34,6 +36,7 @@ public class PedidoServiceImpl implements PedidoService {
     EstabelecimentoRepository estabelecimentoRepository;
 
     @Override
+    @Transactional
     public PedidoResponseDTO criar(Long clienteId, String clienteCodigoAcesso, Long estabelecimentoId,
             PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
         Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
@@ -56,6 +59,31 @@ public class PedidoServiceImpl implements PedidoService {
         return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
 
+    @Override
+    public PedidoResponseDTO atualizar(Long pedidoId, String clienteCodigoAcesso,
+            PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
+        PedidoPostPutRequestDTO a = pedidoPostPutRequestDTO;
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Cliente cliente = clienteRepository.findById(pedido.getClienteId()).get();
+
+        Util.verificaCodAcesso(clienteCodigoAcesso,cliente.getCodigoAcesso());
+
+        if (pedidoPostPutRequestDTO.getEnderecoEntrega() != null) {
+            pedido.setEnderecoEntrega(pedidoPostPutRequestDTO.getEnderecoEntrega());
+        } else {
+            pedido.setEnderecoEntrega(cliente.getEndereco());
+        }
+
+        List<Pizza> pizzas = pedidoPostPutRequestDTO.getPizzas();
+        pedido.setPizzas(pedidoPostPutRequestDTO.getPizzas());
+        pedido.setPreco(calculaPrecoPedido(pedidoPostPutRequestDTO.getPizzas()));
+
+        pedidoRepository.saveAndFlush(pedido);
+        PedidoResponseDTO test = modelMapper.map(pedido, PedidoResponseDTO.class);
+
+        return modelMapper.map(pedido, PedidoResponseDTO.class);
+    }
+
     private Double calculaPrecoPedido(List<Pizza> pizzas) {
         Double preco = 0.0;
         for (Pizza pizza : pizzas) {
@@ -63,4 +91,5 @@ public class PedidoServiceImpl implements PedidoService {
         }
         return preco;
     }
+
 }

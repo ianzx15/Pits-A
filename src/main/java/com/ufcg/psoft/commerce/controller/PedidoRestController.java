@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +23,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping(value = "/pedidos", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PedidoRestController {
+
     @Autowired
     private PedidoServiceImpl pedidoService;
 
@@ -31,4 +34,10 @@ public class PedidoRestController {
             .body(pedidoService.criar(clienteId, clienteCodigoAcesso, estabelecimentoId, pedidoPostPutRequestDTO));
     } 
     
+    @PutMapping
+    ResponseEntity<PedidoResponseDTO> atualizar(@RequestParam Long pedidoId, @RequestParam String codigoAcesso,
+            @Valid @RequestBody PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(pedidoService.atualizar(pedidoId, codigoAcesso, pedidoPostPutRequestDTO));
+    }
 }
