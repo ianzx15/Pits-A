@@ -1,10 +1,13 @@
 package com.ufcg.psoft.commerce.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
+import com.ufcg.psoft.commerce.model.Pedido;
 import com.ufcg.psoft.commerce.service.pedido.PedidoServiceImpl;
 
 import jakarta.validation.Valid;
@@ -38,5 +42,11 @@ public class PedidoRestController {
             @Valid @RequestBody PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
         return ResponseEntity.status(HttpStatus.OK)
             .body(pedidoService.atualizar(pedidoId, codigoAcesso, pedidoPostPutRequestDTO));
+    }
+
+    @GetMapping
+    ResponseEntity<List<Pedido>> recuperaTodos(@RequestParam Long clienteId){
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(pedidoService.recuperaTodosCliente(clienteId));
     }
 }
