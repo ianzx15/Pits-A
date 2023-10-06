@@ -19,6 +19,7 @@ import com.ufcg.psoft.commerce.model.Pizza;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
 import com.ufcg.psoft.commerce.repository.PedidoRepository;
+import com.ufcg.psoft.commerce.repository.PizzaRepository;
 
 @Service
 public class PedidoServiceImpl implements PedidoService {
@@ -33,6 +34,9 @@ public class PedidoServiceImpl implements PedidoService {
     ClienteRepository clienteRepository;
 
     @Autowired
+    PizzaRepository pizzaRepository;
+
+    @Autowired
     EstabelecimentoRepository estabelecimentoRepository;
 
     @Override
@@ -45,6 +49,10 @@ public class PedidoServiceImpl implements PedidoService {
 
         if (pedidoPostPutRequestDTO.getEnderecoEntrega() == null) {
             pedidoPostPutRequestDTO.setEnderecoEntrega(cliente.getEndereco());
+        }
+
+        for (Pizza p : pedidoPostPutRequestDTO.getPizzas()) {
+            pizzaRepository.save(p);
         }
 
         Pedido pedido = pedidoRepository.save(Pedido.builder()
@@ -62,7 +70,6 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public PedidoResponseDTO atualizar(Long pedidoId, String clienteCodigoAcesso,
             PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
-        PedidoPostPutRequestDTO a = pedidoPostPutRequestDTO;
         Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
         Cliente cliente = clienteRepository.findById(pedido.getClienteId()).get();
 
@@ -74,13 +81,15 @@ public class PedidoServiceImpl implements PedidoService {
             pedido.setEnderecoEntrega(cliente.getEndereco());
         }
 
-        List<Pizza> pizzas = pedidoPostPutRequestDTO.getPizzas();
+        for (Pizza p : pedidoPostPutRequestDTO.getPizzas()) {
+            pizzaRepository.save(p);
+        }
+
         pedido.setPizzas(pedidoPostPutRequestDTO.getPizzas());
         pedido.setPreco(calculaPrecoPedido(pedidoPostPutRequestDTO.getPizzas()));
 
         pedidoRepository.saveAndFlush(pedido);
-        PedidoResponseDTO test = modelMapper.map(pedido, PedidoResponseDTO.class);
-
+        
         return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
 
