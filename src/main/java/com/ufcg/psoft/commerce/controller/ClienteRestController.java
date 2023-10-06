@@ -65,4 +65,15 @@ public class ClienteRestController {
                 .build();
     }
 
+    @PutMapping("/{clienteId}/demonstrarInteresse")
+    public ResponseEntity<?> demonstrarInteresse(
+        @PathVariable("clienteId") @Valid Long clienteId,
+        @RequestParam String codigoAcesso,
+        @RequestParam Long saborId
+    ){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(clienteService.demonstrarInteresse(codigoAcesso, clienteId, saborId));
+    }
+
 }

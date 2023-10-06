@@ -3,9 +3,15 @@ package com.ufcg.psoft.commerce.service.cliente;
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
+import com.ufcg.psoft.commerce.dto.sabor.SaborResponseDTO;
 import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
+import com.ufcg.psoft.commerce.exception.sabor.SaborJaDisponivel;
+import com.ufcg.psoft.commerce.exception.sabor.SaborNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Cliente;
+import com.ufcg.psoft.commerce.model.Sabor;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
+import com.ufcg.psoft.commerce.repository.SaborRepository;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +20,13 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-public class ClienteServiceImpl implements ClienteService{
-
+public class ClienteServiceImpl implements ClienteService {
 
     @Autowired
     ClienteRepository clienteRepository;
+
+    @Autowired
+    SaborRepository saborRepository;
 
     @Autowired
     ModelMapper modelMapper;
@@ -34,7 +42,7 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
     public Cliente put(Long id, ClientePostPutRequestDTO clientePostPutRequestDTO, String codigoAcesso) {
-        this.clienteRepository.findById(id).map(cliente ->{
+        this.clienteRepository.findById(id).map(cliente -> {
             Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
             cliente.setCodigoAcesso(clientePostPutRequestDTO.getCodigoAcesso());
             cliente.setNome(clientePostPutRequestDTO.getNome());
@@ -45,12 +53,10 @@ public class ClienteServiceImpl implements ClienteService{
         return this.clienteRepository.findById(id).get();
     }
 
-
     public ClienteResponseDTO getOne(Long id) {
         Cliente cliente = this.clienteRepository.findById(id).orElseThrow(ClienteNotFoundException::new);
         return modelMapper.map(cliente, ClienteResponseDTO.class);
     }
-
 
     public Collection<ClienteResponseDTO> getAll() {
         Collection<Cliente> allClientes = clienteRepository.findAll();
@@ -61,5 +67,22 @@ public class ClienteServiceImpl implements ClienteService{
                 .collect(Collectors.toList());
     }
 
+    public SaborResponseDTO demonstrarInteresse(String codigoAcessoCliente, Long idCliente, Long idSabor) {
+        Cliente cliente = this.getCliente(codigoAcessoCliente, idCliente);
+
+        Sabor sabor = this.saborRepository.findById(idSabor).orElseThrow(SaborNaoEncontrado::new);
+        if (sabor.getDisponivel()) {
+            throw new SaborJaDisponivel();
+        }
+        sabor.getClientesInteressados().add(cliente);
+
+        return modelMapper.map(sabor, SaborResponseDTO.class);
+    }
+
+    public Cliente getCliente (String codigoAcesso, Long id) {
+        Cliente cliente = this.clienteRepository.findById(id).orElseThrow(ClienteNotFoundException::new);
+        Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
+        return cliente;
+    }
 
 }
