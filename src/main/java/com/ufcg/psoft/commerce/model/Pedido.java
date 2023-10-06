@@ -48,7 +48,8 @@ public class Pedido {
     @Column(name = "preco")
     private Double preco;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL,
+    @JsonProperty("pizzas")
+    @OneToMany(mappedBy = "pedido",
     orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Pizza> pizzas;
     

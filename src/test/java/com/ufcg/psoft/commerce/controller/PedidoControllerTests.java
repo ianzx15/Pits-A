@@ -181,7 +181,7 @@ public class PedidoControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Pedido resultado = objectMapper.readValue(responseJsonString, Pedido.PedidoBuilder.class).build();
+            Pedido resultado = objectMapper.readValue(responseJsonString, Pedido.class);
 
             // Assert
             assertAll(
