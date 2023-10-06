@@ -1,12 +1,14 @@
 package com.ufcg.psoft.commerce.model;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.AllArgsConstructor;
@@ -36,9 +38,8 @@ public class Pizza {
     @Column(name = "tamanho")
     private String tamanho;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @PrimaryKeyJoinColumn
-    private Pedido pedido;
+    @ManyToMany(mappedBy = "pizzas", fetch = FetchType.LAZY)
+    private List<Pedido> pedidos;
 
     public Double calculaSubTotal() {
         Double valor = 0.0;
