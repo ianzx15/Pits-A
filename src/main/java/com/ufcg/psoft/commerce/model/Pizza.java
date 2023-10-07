@@ -40,19 +40,5 @@ public class Pizza {
 
     @ManyToMany(mappedBy = "pizzas", fetch = FetchType.LAZY)
     private List<Pedido> pedidos;
-
-    public Double calculaSubTotal() {
-        Double valor = 0.0;
-        if (tamanho.equals("media")) {
-            valor += sabor1.getPrecoM();
-        } else if (tamanho.equals("grande")) {
-            valor += sabor1.getPrecoG();
-            if (sabor2 != null) {
-                valor += sabor2.getPrecoG();
-                valor /= 2;
-            }
-        }
-        return valor;
-    }
     
 }

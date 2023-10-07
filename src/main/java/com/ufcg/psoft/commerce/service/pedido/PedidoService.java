@@ -13,5 +13,11 @@ public interface PedidoService {
     public PedidoResponseDTO atualizar(Long pedidoId, String clienteCodigoAcesso,
     PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
 
-    public List<Pedido> recuperaTodosCliente(Long clienteId);
+    public List<Pedido> recuperaTodosPedidos(Long clienteId, String codigoAcesso);
+
+    public Pedido recuperaPedidoPorIdCliente(Long pedidoId, Long clienteId, String codigoAcesso);
+
+    public List<Pedido> recuperaPedidosPorEstabelecimento(Long estabelecimentoId, String codigoAcesso);
+
+    public Pedido recuperaPedidoPorIdEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso);
 }

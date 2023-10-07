@@ -12,7 +12,9 @@ import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoEncontrado;
+import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPertenceAEntidade;
 import com.ufcg.psoft.commerce.model.Cliente;
+import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.model.Pedido;
 import com.ufcg.psoft.commerce.model.Pizza;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
@@ -89,17 +91,66 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public List<Pedido> recuperaTodosCliente(Long clienteId) {
-        clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+    public List<Pedido> recuperaTodosPedidos(Long clienteId, String codigoAcesso) {
+        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
+
         return pedidoRepository.findByClienteId(clienteId);
+    }
+
+    @Override
+    public Pedido recuperaPedidoPorIdCliente(Long pedidoId, Long clienteId, String codigoAcesso) {
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        if (!pedido.getClienteId().equals(clienteId)) {
+            throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
+        }
+        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+    
+        Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
+
+        return pedido;
+    }
+
+    @Override
+    public List<Pedido> recuperaPedidosPorEstabelecimento(Long estabelecimentoId, String codigoAcesso) {
+        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
+
+        return pedidoRepository.findByEstabelecimentoId(estabelecimentoId);
+    }
+
+    @Override
+    public Pedido recuperaPedidoPorIdEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso) {
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        if (!pedido.getEstabelecimentoId().equals(estabelecimentoId)) {
+            throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
+        }
+        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
+
+        return pedido;
     }
 
     private Double calculaPrecoPedido(List<Pizza> pizzas) {
         Double preco = 0.0;
         for (Pizza pizza : pizzas) {
-           preco += pizza.calculaSubTotal();
+           preco += calculaSubTotal(pizza);
         }
         return preco;
+    }
+
+    private Double calculaSubTotal(Pizza pizza) {
+        Double valor = 0.0;
+        if (pizza.getTamanho().equals("media")) {
+            valor += pizza.getSabor1().getPrecoM();
+        } else if (pizza.getTamanho().equals("grande")) {
+            valor += pizza.getSabor1().getPrecoG();
+            if (pizza.getSabor2() != null) {
+                valor += pizza.getSabor2().getPrecoG();
+                valor /= 2;
+            }
+        }
+        return valor;
     }
 
 }
