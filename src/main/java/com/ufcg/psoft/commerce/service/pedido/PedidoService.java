@@ -8,10 +8,10 @@ import com.ufcg.psoft.commerce.model.Pedido;
 
 public interface PedidoService {
     public PedidoResponseDTO criar(Long clienteId, String clienteCodigoAcesso,
-    Long estabelecimentoId, PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
-    
+            Long estabelecimentoId, PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
+
     public PedidoResponseDTO atualizar(Long pedidoId, String clienteCodigoAcesso,
-    PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
+            PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
 
     public List<Pedido> recuperaTodosPedidosCliente(Long clienteId, String codigoAcesso);
 
@@ -21,7 +21,8 @@ public interface PedidoService {
 
     public Pedido recuperaPedidoPorIdEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso);
 
-    public List<PedidoResponseDTO> clienteRecuperaPedidoPorEstabelecimento(Long clienteId, Long estabelecimentoId, Long pedidoId, String clienteCodigoAcesso);
+    public List<PedidoResponseDTO> clienteRecuperaPedidoPorEstabelecimento(Long clienteId, Long estabelecimentoId,
+            Long pedidoId, String clienteCodigoAcesso);
 
     public void deletePorCliente(Long pedidoId, Long clienteId, String codigoAcesso);
 
@@ -31,4 +32,6 @@ public interface PedidoService {
 
     public void deleteTodosPedidosEstabelecimento(Long estabelecimentoId);
 
+    public PedidoResponseDTO confirmarPagamento(Long clientId, Long pedidoId, String codigoAcessoCliente,
+            String metodoPagamento);
 }
