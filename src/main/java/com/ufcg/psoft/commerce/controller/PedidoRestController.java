@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
@@ -70,4 +71,34 @@ public class PedidoRestController {
         return ResponseEntity.status(HttpStatus.OK)
             .body(pedidoService.recuperaPedidoPorIdEstabelecimento(pedidoId, estabelecimentoId, codigoAcesso));
     }
+
+    @DeleteMapping("/{pedidoId}/{clienteId}")
+    public  ResponseEntity<?> deletePorCliente(@PathVariable Long pedidoId, @PathVariable Long clienteId, @RequestParam String codigoAcesso){
+        this.pedidoService.deletePorCliente(pedidoId, clienteId, codigoAcesso);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    @DeleteMapping("/{pedidoId}/{estabelecimentoId}/{codigoAcesso}")
+    public  ResponseEntity<?> deletePorEstabelecimento(@PathVariable Long pedidoId, @PathVariable Long estabelecimentoId, @PathVariable String codigoAcesso){
+        this.pedidoService.deletePorEstabelecimento(pedidoId, estabelecimentoId, codigoAcesso);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+
+    @DeleteMapping("/{estabelecimentoId}")
+    public  ResponseEntity<?> deleteAllEstabelecimento(@PathVariable Long estabelecimentoId){
+        this.pedidoService.deleteTodosSaboresEstabelecimento(estabelecimentoId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    @DeleteMapping()
+    public  ResponseEntity<?> deleteAllCliente(@RequestParam Long clienteId){
+        this.pedidoService.deleteTodosSaboresCliente(clienteId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
 }
