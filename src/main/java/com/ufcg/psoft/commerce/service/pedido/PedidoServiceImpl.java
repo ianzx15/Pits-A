@@ -1,6 +1,7 @@
 package com.ufcg.psoft.commerce.service.pedido;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ufcg.psoft.commerce.model.Estabelecimento;
 import org.modelmapper.ModelMapper;
@@ -129,6 +130,33 @@ public class PedidoServiceImpl implements PedidoService {
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
         return pedido;
+    }
+
+    @Override
+    public List<PedidoResponseDTO> clienteRecuperaPedidoPorEstabelecimento(Long clienteId, Long estabelecimentoId, Long pedidoId, String clienteCodigoAcesso){
+        estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        if (pedidoId == null) {
+            List<Pedido> pedidos = pedidoRepository.findByClienteIdAndEstabelecimentoId(clienteId, estabelecimentoId);
+            return pedidos.stream()
+                        .map(pedido -> modelMapper
+                            .map(pedido, PedidoResponseDTO.class))
+                            .collect(Collectors.toList());
+        }
+
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+
+        if (!pedido.getClienteId().equals(clienteId)) {
+            throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
+        } else if (!pedido.getEstabelecimentoId().equals(estabelecimentoId)) {
+            throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
+        }
+
+        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+
+        Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
+
+        return List.of(modelMapper.map(pedido, PedidoResponseDTO.class));
     }
 
     @Override

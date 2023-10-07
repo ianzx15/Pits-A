@@ -64,9 +64,13 @@ public class PedidoRestController {
             .body(pedidoService.recuperaPedidoPorIdEstabelecimento(pedidoId, estabelecimentoId, codigoAcesso));
     }
 
-    // @GetMapping("/pedido-cliente-estabelecimento/{clienteId}/{estabelecimentoId}/{pedidoId}")
-    // ResponseEntity<?> clienteRecuperaPedidoPorEstabelecimento(@PathVariable Long clienteId, @PathVariable Long estabelecimentoId,
-    //         @PathVariable Long pedidoId, @RequestParam String codigoAcesso){
+    @GetMapping(value = {"/pedido-cliente-estabelecimento/{clienteId}/{estabelecimentoId}/{pedidoId}",
+                "/pedido-cliente-estabelecimento/{clienteId}/{estabelecimentoId}"})
+    ResponseEntity<List<PedidoResponseDTO>> clienteRecuperaPedidoPorEstabelecimento(@PathVariable Long clienteId, @PathVariable Long estabelecimentoId,
+            @PathVariable Long pedidoId, @RequestParam String clienteCodigoAcesso) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(pedidoService.clienteRecuperaPedidoPorEstabelecimento(clienteId, estabelecimentoId, pedidoId, clienteCodigoAcesso));
+    }
 
 
     @DeleteMapping("/{pedidoId}/{clienteId}")

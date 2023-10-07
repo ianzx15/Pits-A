@@ -21,6 +21,8 @@ public interface PedidoService {
 
     public Pedido recuperaPedidoPorIdEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso);
 
+    public List<PedidoResponseDTO> clienteRecuperaPedidoPorEstabelecimento(Long clienteId, Long estabelecimentoId, Long pedidoId, String clienteCodigoAcesso);
+
     public void deletePorCliente(Long pedidoId, Long clienteId, String codigoAcesso);
 
     public void deletePorEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso);
