@@ -1,11 +1,14 @@
 package com.ufcg.psoft.commerce.model;
 
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.AllArgsConstructor;
@@ -41,4 +44,9 @@ public class Sabor {
   @ManyToOne(fetch = FetchType.LAZY)
   @PrimaryKeyJoinColumn
   private Estabelecimento estabelecimento;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @PrimaryKeyJoinColumn
+  private Set<Cliente> clientesInteressados;
+
 }
