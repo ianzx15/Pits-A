@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +30,7 @@ public class Pizza {
 
     @OneToOne
     @PrimaryKeyJoinColumn
+    @NotNull(message = "Pizza deve ter pelo menos um sabor")
     private Sabor sabor1;
 
     @OneToOne
@@ -36,6 +38,7 @@ public class Pizza {
     private Sabor sabor2;
 
     @Column(name = "tamanho")
+    @NotNull(message = "Pizza deve ter um tamanho")
     private String tamanho;
 
     @ManyToMany(mappedBy = "pizzas", fetch = FetchType.LAZY)
