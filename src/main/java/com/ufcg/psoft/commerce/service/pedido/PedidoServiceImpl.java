@@ -15,7 +15,6 @@ import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncon
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPertenceAEntidade;
 import com.ufcg.psoft.commerce.model.Cliente;
-import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.model.Pedido;
 import com.ufcg.psoft.commerce.model.Pizza;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
@@ -92,7 +91,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public List<Pedido> recuperaTodosPedidos(Long clienteId, String codigoAcesso) {
+    public List<Pedido> recuperaTodosPedidosCliente(Long clienteId, String codigoAcesso) {
         Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
 
@@ -113,7 +112,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public List<Pedido> recuperaPedidosPorEstabelecimento(Long estabelecimentoId, String codigoAcesso) {
+    public List<Pedido> recuperaTodosPedidosEstabelecimento(Long estabelecimentoId, String codigoAcesso) {
         Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
@@ -134,33 +133,42 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public void deletePorCliente(Long pedidoId, Long clienteId, String codigoAcesso){
-       Pedido pedido = this.pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
-       Cliente cliente = this.clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
-       Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
-       this.pedidoRepository.deleteById(pedidoId);
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        if (!pedido.getClienteId().equals(clienteId)) {
+            throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
+        }
+        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
+
+        pedidoRepository.deleteById(pedidoId);
     }
 
     @Override
     public void deletePorEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso){
-        Pedido pedido = this.pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        if (!pedido.getEstabelecimentoId().equals(estabelecimentoId)) {
+            throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
+        }
+        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
+                    .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
+
         this.pedidoRepository.deleteById(pedidoId);
     }
 
     @Override
-    public void deleteTodosSaboresEstabelecimento(Long estabelecimentoId){
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
-        this.pedidoRepository.deleteAll();
+    public void deleteTodosPedidosEstabelecimento(Long estabelecimentoId){
+        estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+
+        pedidoRepository.deleteByEstabelecimentoId(estabelecimentoId);;
     }
 
     @Override
-    public void deleteTodosSaboresCliente(Long clienteId){
-        Cliente cliente = this.clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
-        this.pedidoRepository.deleteAll();
+    public void deleteTodosPedidosCliente(Long clienteId){
+        clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+
+        pedidoRepository.deleteByClienteId(clienteId);;
     }
-
-
 
     private Double calculaPrecoPedido(List<Pizza> pizzas) {
         Double preco = 0.0;

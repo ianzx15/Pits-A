@@ -7,14 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
@@ -49,7 +41,7 @@ public class PedidoRestController {
     @GetMapping
     ResponseEntity<List<Pedido>> recuperaTodosPedidos(@RequestParam Long clienteId, @RequestParam String codigoAcesso){
         return ResponseEntity.status(HttpStatus.OK)
-            .body(pedidoService.recuperaTodosPedidos(clienteId, codigoAcesso));
+            .body(pedidoService.recuperaTodosPedidosCliente(clienteId, codigoAcesso));
     }
 
     @GetMapping("/{pedidoId}/{clienteId}")
@@ -62,41 +54,46 @@ public class PedidoRestController {
     @GetMapping("/{estabelecimentoId}")
     ResponseEntity<List<Pedido>> recuperaPedidosPorEstabelecimento(@PathVariable Long estabelecimentoId, @RequestParam String codigoAcesso){
         return ResponseEntity.status(HttpStatus.OK)
-            .body(pedidoService.recuperaPedidosPorEstabelecimento(estabelecimentoId, codigoAcesso));
+            .body(pedidoService.recuperaTodosPedidosEstabelecimento(estabelecimentoId, codigoAcesso));
     }
 
-    @GetMapping("/{pedidoId}/{estabelcimentoId}/{codigoAcesso}")
+    @GetMapping("/{pedidoId}/{estabelecimentoId}/{codigoAcesso}")
     ResponseEntity<Pedido> recuperaPedidoPorIdEstabelecimento(@PathVariable Long pedidoId, @PathVariable Long estabelecimentoId,
             @PathVariable String codigoAcesso){
         return ResponseEntity.status(HttpStatus.OK)
             .body(pedidoService.recuperaPedidoPorIdEstabelecimento(pedidoId, estabelecimentoId, codigoAcesso));
     }
 
+    // @GetMapping("/pedido-cliente-estabelecimento/{clienteId}/{estabelecimentoId}/{pedidoId}")
+    // ResponseEntity<?> clienteRecuperaPedidoPorEstabelecimento(@PathVariable Long clienteId, @PathVariable Long estabelecimentoId,
+    //         @PathVariable Long pedidoId, @RequestParam String codigoAcesso){
+
+
     @DeleteMapping("/{pedidoId}/{clienteId}")
-    public  ResponseEntity<?> deletePorCliente(@PathVariable Long pedidoId, @PathVariable Long clienteId, @RequestParam String codigoAcesso){
-        this.pedidoService.deletePorCliente(pedidoId, clienteId, codigoAcesso);
+    ResponseEntity<?> deletePorCliente(@PathVariable Long pedidoId, @PathVariable Long clienteId, @RequestParam String codigoAcesso){
+        pedidoService.deletePorCliente(pedidoId, clienteId, codigoAcesso);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
     @DeleteMapping("/{pedidoId}/{estabelecimentoId}/{codigoAcesso}")
-    public  ResponseEntity<?> deletePorEstabelecimento(@PathVariable Long pedidoId, @PathVariable Long estabelecimentoId, @PathVariable String codigoAcesso){
-        this.pedidoService.deletePorEstabelecimento(pedidoId, estabelecimentoId, codigoAcesso);
+    ResponseEntity<?> deletePorEstabelecimento(@PathVariable Long pedidoId, @PathVariable Long estabelecimentoId, @PathVariable String codigoAcesso){
+        pedidoService.deletePorEstabelecimento(pedidoId, estabelecimentoId, codigoAcesso);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
 
     @DeleteMapping("/{estabelecimentoId}")
-    public  ResponseEntity<?> deleteAllEstabelecimento(@PathVariable Long estabelecimentoId){
-        this.pedidoService.deleteTodosSaboresEstabelecimento(estabelecimentoId);
+    ResponseEntity<?> deleteAllEstabelecimento(@PathVariable Long estabelecimentoId){
+        pedidoService.deleteTodosPedidosEstabelecimento(estabelecimentoId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
     @DeleteMapping()
-    public  ResponseEntity<?> deleteAllCliente(@RequestParam Long clienteId){
-        this.pedidoService.deleteTodosSaboresCliente(clienteId);
+    ResponseEntity<?> deleteAllCliente(@RequestParam Long clienteId){
+        pedidoService.deleteTodosPedidosCliente(clienteId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }

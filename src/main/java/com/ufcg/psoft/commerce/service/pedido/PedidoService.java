@@ -13,11 +13,11 @@ public interface PedidoService {
     public PedidoResponseDTO atualizar(Long pedidoId, String clienteCodigoAcesso,
     PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
 
-    public List<Pedido> recuperaTodosPedidos(Long clienteId, String codigoAcesso);
+    public List<Pedido> recuperaTodosPedidosCliente(Long clienteId, String codigoAcesso);
 
     public Pedido recuperaPedidoPorIdCliente(Long pedidoId, Long clienteId, String codigoAcesso);
 
-    public List<Pedido> recuperaPedidosPorEstabelecimento(Long estabelecimentoId, String codigoAcesso);
+    public List<Pedido> recuperaTodosPedidosEstabelecimento(Long estabelecimentoId, String codigoAcesso);
 
     public Pedido recuperaPedidoPorIdEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso);
 
@@ -25,7 +25,8 @@ public interface PedidoService {
 
     public void deletePorEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso);
 
-    public void deleteTodosSaboresCliente(Long clienteId);
-    public void deleteTodosSaboresEstabelecimento(Long estabelecimentoId);
+    public void deleteTodosPedidosCliente(Long clienteId);
+
+    public void deleteTodosPedidosEstabelecimento(Long estabelecimentoId);
 
 }
