@@ -10,8 +10,10 @@ import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -496,8 +498,10 @@ public class PedidoControllerTests {
             assertTrue(responseJsonString.isBlank());
         }
 
+
         @Test
         @DisplayName("Quando um estabelencimento excluí um pedido feito nele salvo")
+
         void quandoEstabelecimentoExcluiPedidoSalvo() throws Exception {
             // Arrange
             pedidoRepository.save(pedido);
@@ -521,7 +525,7 @@ public class PedidoControllerTests {
             // nenhuma necessidade além do setup()
 
             // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + "999999" + "/" + estabelecimento.getId())
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + "999999" + "/" + estabelecimento.getId() + "/" + estabelecimento.getCodigoAcesso())
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("codigoAcesso", estabelecimento.getCodigoAcesso()))
                     .andExpect(status().isBadRequest())

@@ -14,4 +14,12 @@ public interface PedidoService {
     PedidoPostPutRequestDTO pedidoPostPutRequestDTO);
 
     public List<Pedido> recuperaTodosCliente(Long clienteId);
+
+    public void deletePorCliente(Long pedidoId, Long clienteId, String codigoAcesso);
+
+    public void deletePorEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso);
+
+    public void deleteTodosSaboresCliente(Long clienteId);
+    public void deleteTodosSaboresEstabelecimento(Long estabelecimentoId);
+
 }
