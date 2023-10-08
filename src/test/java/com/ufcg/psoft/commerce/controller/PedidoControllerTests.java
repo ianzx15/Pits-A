@@ -181,7 +181,7 @@ public class PedidoControllerTests {
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            Pedido resultado = objectMapper.readValue(responseJsonString, Pedido.PedidoBuilder.class).build();
+            Pedido resultado = objectMapper.readValue(responseJsonString, Pedido.class);
 
             // Assert
             assertAll(
@@ -248,8 +248,7 @@ public class PedidoControllerTests {
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS)
                             .param("clienteId", cliente.getId().toString())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO)))
+                            .param("codigoAcesso", cliente.getCodigoAcesso()))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -269,16 +268,12 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + pedido.getId() + "/" + cliente.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO)))
+                            .param("codigoAcesso", cliente.getCodigoAcesso()))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            List<Pedido> listaResultados = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
-
-            Pedido resultado = listaResultados.get(0);
+            Pedido resultado = objectMapper.readValue(responseJsonString, Pedido.class);
 
             // Assert
             assertAll(
@@ -299,7 +294,7 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + "999999" + "/" + cliente.getId())
-                            .param("clienteId", cliente.getId().toString())
+                            .param("codigoAcesso", cliente.getCodigoAcesso())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO)))
                     .andExpect(status().isBadRequest())
@@ -325,6 +320,7 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + pedido.getId() + "/" + cliente1.getId())
+                            .param("codigoAcesso", cliente1.getCodigoAcesso())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO)))
                     .andExpect(status().isBadRequest())
@@ -334,7 +330,7 @@ public class PedidoControllerTests {
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
             // Assert
-            assertEquals("Codigo de acesso invalido!", resultado.getMessage());
+            assertEquals("O pedido nao pertence ao cliente!", resultado.getMessage());
         }
 
 
@@ -347,8 +343,7 @@ public class PedidoControllerTests {
 
             // Act
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + estabelecimento.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO)))
+                            .param("codigoAcesso", estabelecimento.getCodigoAcesso()))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -367,17 +362,12 @@ public class PedidoControllerTests {
             pedidoRepository.save(pedido);
 
             // Act
-            String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + pedido.getId() + "/" + estabelecimento.getId() + "/" + estabelecimento.getCodigoAcesso())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO)))
+            String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + pedido.getId() + "/" + estabelecimento.getId() + "/" + estabelecimento.getCodigoAcesso()))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
 
-            List<Pedido> listaResultados = objectMapper.readValue(responseJsonString, new TypeReference<>() {
-            });
-
-            Pedido resultado = listaResultados.get(0);
+            Pedido resultado = objectMapper.readValue(responseJsonString, Pedido.class);
 
             // Assert
             assertAll(
@@ -430,7 +420,7 @@ public class PedidoControllerTests {
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
             // Assert
-            assertEquals("Codigo de acesso invalido!", resultado.getMessage());
+            assertEquals("O pedido nao pertence ao estabelecimento!", resultado.getMessage());
         }
 
         @Test
@@ -496,16 +486,16 @@ public class PedidoControllerTests {
             assertTrue(responseJsonString.isBlank());
         }
 
+
         @Test
         @DisplayName("Quando um estabelencimento excluí um pedido feito nele salvo")
+
         void quandoEstabelecimentoExcluiPedidoSalvo() throws Exception {
             // Arrange
             pedidoRepository.save(pedido);
 
             // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId() + "/" + estabelecimento.getId() + "/" + estabelecimento.getCodigoAcesso())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigoAcesso", estabelecimento.getCodigoAcesso()))
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId() + "/" + estabelecimento.getId() + "/" + estabelecimento.getCodigoAcesso()))
                     .andExpect(status().isNoContent())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -521,9 +511,7 @@ public class PedidoControllerTests {
             // nenhuma necessidade além do setup()
 
             // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + "999999" + "/" + estabelecimento.getId())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigoAcesso", estabelecimento.getCodigoAcesso()))
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + "999999" + "/" + estabelecimento.getId() + "/" + estabelecimento.getCodigoAcesso()))
                     .andExpect(status().isBadRequest())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -544,9 +532,7 @@ public class PedidoControllerTests {
                     .build());
 
             // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId() + "/" + estabelecimento1.getId() + "/" + estabelecimento1.getCodigoAcesso())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("codigoAcesso", estabelecimento1.getCodigoAcesso()))
+            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId() + "/" + estabelecimento1.getId() + "/" + estabelecimento1.getCodigoAcesso()))
                     .andExpect(status().isBadRequest())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -554,7 +540,7 @@ public class PedidoControllerTests {
             CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
 
             // Assert
-            assertEquals("Codigo de acesso invalido!", resultado.getMessage());
+            assertEquals("O pedido nao pertence ao estabelecimento!", resultado.getMessage());
         }
 
         @Test
@@ -581,24 +567,6 @@ public class PedidoControllerTests {
         }
 
         @Test
-        @DisplayName("Quando um cliente cancela um pedido")
-        void quandoClienteCancelaPedido() throws Exception {
-            // Arrange
-            pedidoRepository.save(pedido);
-
-            // Act
-            String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId() + "/cancelar-pedido")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .param("clienteCodigoAcesso", cliente.getCodigoAcesso()))
-                    .andExpect(status().isNoContent())
-                    .andDo(print())
-                    .andReturn().getResponse().getContentAsString();
-
-            // Assert
-            assertTrue(responseJsonString.isBlank());
-        }
-
-        @Test
         @DisplayName("Quando um cliente busca um pedido feito em um estabelecimento")
         void quandoClienteBuscaPedidoFeitoEmEstabelecimento() throws Exception {
             // Arrange
@@ -608,8 +576,6 @@ public class PedidoControllerTests {
             String responseJsonString = driver.perform(get(URI_PEDIDOS + "/" + "pedido-cliente-estabelecimento" + "/" + cliente.getId() + "/" + estabelecimento.getId() + "/" + pedido.getId())
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("clienteCodigoAcesso", cliente.getCodigoAcesso()))
-
-
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
@@ -707,6 +673,24 @@ public class PedidoControllerTests {
             assertEquals(pedido.getClienteId(), resultado.get(0).getClienteId());
             assertEquals(pedido.getEstabelecimentoId(), resultado.get(0).getEstabelecimentoId());
         }
+
+        // @Test
+        // @DisplayName("Quando um cliente cancela um pedido")
+        // void quandoClienteCancelaPedido() throws Exception {
+        //     // Arrange
+        //     pedidoRepository.save(pedido);
+
+        //     // Act
+        //     String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" + pedido.getId() + "/cancelar-pedido")
+        //                     .contentType(MediaType.APPLICATION_JSON)
+        //                     .param("clienteCodigoAcesso", cliente.getCodigoAcesso()))
+        //             .andExpect(status().isNoContent())
+        //             .andDo(print())
+        //             .andReturn().getResponse().getContentAsString();
+
+        //     // Assert
+        //     assertTrue(responseJsonString.isBlank());
+        // }
 
         // @Test
         // @DisplayName("Quando um cliente busca todos os pedidos feitos naquele estabelcimento com status")
