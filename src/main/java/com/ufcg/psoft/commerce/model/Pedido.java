@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Pedido {
-    
+
     @JsonProperty("id")
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -52,15 +52,15 @@ public class Pedido {
 
     @JsonProperty("pizzas")
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "pedido_pizza",
-        joinColumns = {
+    @JoinTable(name = "pedido_pizza", joinColumns = {
             @JoinColumn(name = "pedido_id")
-        },
-        inverseJoinColumns = {
+    }, inverseJoinColumns = {
             @JoinColumn(name = "pizza_id")
-        }
-    )
+    })
     private List<Pizza> pizzas;
-    
+
+    @Column(name = "status_pagamento")
+    @JsonProperty("statusPagamento")
+    @Builder.Default
+    private Boolean statusPagamento = false;
 }
