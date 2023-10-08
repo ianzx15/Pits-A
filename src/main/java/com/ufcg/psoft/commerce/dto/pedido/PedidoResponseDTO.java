@@ -34,4 +34,6 @@ public class PedidoResponseDTO {
     @JsonProperty("pizzas")
     private List<Pizza> pizzas;
 
+    @JsonProperty("statusPagamento")
+    private Boolean statusPagamento;
 }

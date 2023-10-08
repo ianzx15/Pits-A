@@ -11,7 +11,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Pedido {
-    
+
     @JsonProperty("id")
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -48,8 +50,17 @@ public class Pedido {
     @Column(name = "preco")
     private Double preco;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL,
-    orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonProperty("pizzas")
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "pedido_pizza", joinColumns = {
+            @JoinColumn(name = "pedido_id")
+    }, inverseJoinColumns = {
+            @JoinColumn(name = "pizza_id")
+    })
     private List<Pizza> pizzas;
-    
+
+    @Column(name = "status_pagamento")
+    @JsonProperty("statusPagamento")
+    @Builder.Default
+    private Boolean statusPagamento = false;
 }
