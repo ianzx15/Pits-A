@@ -8,10 +8,14 @@ import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncon
 import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.model.Sabor;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
+import com.ufcg.psoft.commerce.repository.SaborRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,14 +77,15 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
         return estabelecimento;
     }
 
+
     public List<SaborCardapioDTO> getCardapio(Long id) {
         Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
                 .orElseThrow(EstabelecimentoNaoEncontrado::new);
-        List<Sabor> sabores = estabelecimento.getSabores();
 
-        return sabores.stream().map(sabor -> 
-            modelMapper.map(sabor, SaborCardapioDTO.class)
-          ).toList();
+        estabelecimento.getSabores().sort(Comparator.comparing(Sabor::getDisponivel).reversed());
+        List<Sabor> sabores = estabelecimento.getSabores();
+        return sabores.stream().map(sabor -> modelMapper.map(sabor, SaborCardapioDTO.class))
+                .collect(Collectors.toList());
     }
 
     public List<SaborCardapioDTO> getCardapioPorTipo(Long id, String tipo) {
@@ -92,6 +97,6 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
                     .filter(sabor -> sabor.getTipo().equals(tipo))
                     .map(sabor -> modelMapper.map(sabor, SaborCardapioDTO.class))
                     .collect(Collectors.toList());
-    }   
+    }
 
 }

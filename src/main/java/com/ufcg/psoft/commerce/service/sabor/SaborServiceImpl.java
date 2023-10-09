@@ -1,7 +1,10 @@
 package com.ufcg.psoft.commerce.service.sabor;
 
 import java.util.List;
+import java.util.Set;
 
+import com.ufcg.psoft.commerce.model.Cliente;
+import com.ufcg.psoft.commerce.service.cliente.Notification;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ public class SaborServiceImpl implements SaborService {
   private EstabelecimentoService estabelecimentoService;
   @Autowired
   private ModelMapper modelMapper;
+  @Autowired
+  private Notification notification;
 
   @Override
   public SaborResponseDTO recuperar(Long estabelecimendoId, String codigoDeAcceso, Long saborId) {
@@ -83,7 +88,18 @@ public class SaborServiceImpl implements SaborService {
     Sabor sabor = saborRepository.findById(saborId).orElseThrow(() -> new SaborNaoEncontrado());
     sabor.setDisponivel(disponibilidadePatchDTO.getDisponivel());
 
+    if (disponibilidadePatchDTO.getDisponivel()) {
+      this.notificaDisponibilidade(sabor);
+    }
+
     return modelMapper.map(sabor, SaborResponseDTO.class);
   }
-  
+
+  private void notificaDisponibilidade(Sabor sabor) {
+    Set<Cliente> clientesInteressados = sabor.getClientesInteressados();
+    if (clientesInteressados.size() > 0) {
+      clientesInteressados.forEach(cliente -> this.notification.notificate(sabor.getNome(),cliente.getNome()));
+    }
+  }
+
 }

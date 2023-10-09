@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-public class ClienteServiceImpl implements ClienteService {
+public class ClienteServiceImpl implements ClienteService, Notification {
 
     @Autowired
     ClienteRepository clienteRepository;
@@ -85,4 +85,8 @@ public class ClienteServiceImpl implements ClienteService {
         return cliente;
     }
 
+    @Override
+    public void notificate(String sabor, String nomeCliente) {
+        System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
+    }
 }
