@@ -39,6 +39,7 @@ public class Pedido {
     @Column(name = "estabelecimento_id")
     private Long estabelecimentoId;
 
+    @JsonProperty("entregador_id")
     @Column(name = "entregador_id")
     private Long entregadorId;
 
@@ -63,4 +64,9 @@ public class Pedido {
     @JsonProperty("statusPagamento")
     @Builder.Default
     private Boolean statusPagamento = false;
+
+    @Column(name = "status_entrega")
+    @JsonProperty("statusEntrega")
+    private String statusEntrega = "Pedido recebido";
+
 }

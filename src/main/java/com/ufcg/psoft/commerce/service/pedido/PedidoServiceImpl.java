@@ -248,4 +248,17 @@ public class PedidoServiceImpl implements PedidoService {
         return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
 
+    @Override
+    public PedidoResponseDTO confirmarEntrega(Long pedidoId, Long clienteId, String clienteCodigoAcesso) {
+        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Cliente cliente = this.clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
+
+
+
+
+        pedido.setStatusEntrega("Pedido entregue");
+        return modelMapper.map(pedido, PedidoResponseDTO.class);
+    }
+
 }

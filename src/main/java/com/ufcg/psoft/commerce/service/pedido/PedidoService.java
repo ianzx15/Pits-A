@@ -34,4 +34,6 @@ public interface PedidoService {
 
     public PedidoResponseDTO confirmarPagamento(Long clientId, Long pedidoId, String codigoAcessoCliente,
             String metodoPagamento);
+
+    public PedidoResponseDTO confirmarEntrega(Long pedidoId, Long clienteId, String clienteCodigoAcesso);
 }

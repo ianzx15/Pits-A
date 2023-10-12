@@ -36,4 +36,8 @@ public class PedidoResponseDTO {
 
     @JsonProperty("statusPagamento")
     private Boolean statusPagamento;
+
+    @JsonProperty("statusEntrega")
+    private String statusEntrega;
+
 }

@@ -127,4 +127,12 @@ public class PedidoRestController {
         codigoAcessoCliente, metodoPagamento));
   }
 
+  @PutMapping("/{pedidoId}/{clientId}/cliente-confirmar-entrega")
+  ResponseEntity<?> confirmarEntrega(@PathVariable Long pedidoId, @PathVariable Long clientId,
+                                     @RequestParam String clienteCodigoAcesso) {
+
+    return ResponseEntity.ok()
+            .body(pedidoService.confirmarEntrega(pedidoId, clientId, clienteCodigoAcesso));
+  }
+
 }
