@@ -32,7 +32,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     ModelMapper modelMapper;
 
     public void delete(Long id, String codigoAcesso) {
-        Cliente cliente = this.clienteRepository.findById(id).orElseThrow(ClienteNotFoundException::new);
+        Cliente cliente = retornaCliente(id);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
         this.clienteRepository.deleteById(id);
     }
@@ -54,7 +54,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     }
 
     public ClienteResponseDTO getOne(Long id) {
-        Cliente cliente = this.clienteRepository.findById(id).orElseThrow(ClienteNotFoundException::new);
+        Cliente cliente = retornaCliente(id);
         return modelMapper.map(cliente, ClienteResponseDTO.class);
     }
 
@@ -70,7 +70,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     public SaborResponseDTO demonstrarInteresse(String codigoAcessoCliente, Long idCliente, Long idSabor) {
         Cliente cliente = this.getCliente(codigoAcessoCliente, idCliente);
 
-        Sabor sabor = this.saborRepository.findById(idSabor).orElseThrow(SaborNaoEncontrado::new);
+        Sabor sabor = retornaSabor(idSabor);
         if (sabor.getDisponivel()) {
             throw new SaborJaDisponivel();
         }
@@ -80,7 +80,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     }
 
     public Cliente getCliente (String codigoAcesso, Long id) {
-        Cliente cliente = this.clienteRepository.findById(id).orElseThrow(ClienteNotFoundException::new);
+        Cliente cliente = retornaCliente(id);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
         return cliente;
     }
@@ -88,5 +88,13 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     @Override
     public void notificate(String sabor, String nomeCliente) {
         System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
+    }
+
+    private Cliente retornaCliente(Long clienteId){
+        return this.clienteRepository.findById(clienteId).orElseThrow(ClienteNotFoundException::new);
+    }
+
+    private Sabor retornaSabor(Long saborId ){
+        return this.saborRepository.findById(saborId).orElseThrow(SaborNaoEncontrado::new);
     }
 }
