@@ -28,13 +28,11 @@ public class AssociacaoServiceImpl implements AssociacaoService {
 
     @Override
     public Associacao criar(Long entregadorId, String entregadorCodigoAcesso, Long estabelecimentoId) {
-        Entregador entregador = entregadorRepository.findById(entregadorId)
-            .orElseThrow(EntregadorNotFoundException::new);
+        Entregador entregador = retornaEntregador(entregadorId);
 
         Util.verificaCodAcesso(entregadorCodigoAcesso, entregador.getCodigoAcesso());
 
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-            .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        Estabelecimento estabelecimento = retornaEstabelecimento(estabelecimentoId);
 
         return associacaoRepository.save(Associacao.builder()
             .estabelecimento(estabelecimento)
@@ -45,20 +43,25 @@ public class AssociacaoServiceImpl implements AssociacaoService {
 
     @Override
     public Associacao atualizar(Long entregadorId, String estabelecimentoCodigoAcesso, Long estabelecimentoId) {
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-            .orElseThrow(EstabelecimentoNaoEncontrado::new);
-            
-        entregadorRepository.findById(entregadorId)
-            .orElseThrow(EntregadorNotFoundException::new);
-        Util.verificaCodAcesso(estabelecimentoCodigoAcesso, estabelecimento.getCodigoAcesso());
-        
-        Associacao associacao = associacaoRepository.findByEstabelecimentoIdAndEntregadorId(estabelecimentoId, entregadorId);
+        Estabelecimento estabelecimento = retornaEstabelecimento(estabelecimentoId);
+        retornaEntregador(entregadorId);
 
+        Util.verificaCodAcesso(estabelecimentoCodigoAcesso, estabelecimento.getCodigoAcesso());
+
+        Associacao associacao = associacaoRepository.findByEstabelecimentoIdAndEntregadorId(estabelecimentoId, entregadorId);
 
         associacao.setStatus(true);
 
         associacaoRepository.flush();
         return associacao;
     }
-    
+
+
+    private Estabelecimento retornaEstabelecimento(Long estabelecimentoId){
+        return this.estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+    }
+
+    private Entregador retornaEntregador(Long entregadorId){
+        return this.entregadorRepository.findById(entregadorId).orElseThrow(() -> new EntregadorNotFoundException());
+    }
 }
