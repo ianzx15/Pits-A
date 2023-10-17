@@ -250,15 +250,23 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public PedidoResponseDTO confirmarEntrega(Long pedidoId, Long clienteId, String clienteCodigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
-        Cliente cliente = this.clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Pedido pedido = this.pedidoRepository
+                .findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Cliente cliente = this.clienteRepository
+                .findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
 
-
-
-
         pedido.setStatusEntrega("Pedido entregue");
+        Estabelecimento estabelecimento = this.estabelecimentoRepository
+                .findById(pedido.getEstabelecimentoId())
+                .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        notificate(pedido.getEstabelecimentoId(), pedidoId);
         return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
+
+    private void notificate(Long estabelecimentoId, Long pedidoId) {
+        System.out.println("Olá estabelecimento " + estabelecimentoId + ", o pedido " + pedidoId + " mudou de status para Pedido entregue!");
+    }
+
 
 }
