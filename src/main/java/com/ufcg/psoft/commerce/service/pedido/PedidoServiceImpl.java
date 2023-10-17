@@ -46,7 +46,7 @@ public class PedidoServiceImpl implements PedidoService {
     public PedidoResponseDTO criar(Long clienteId, String clienteCodigoAcesso, Long estabelecimentoId,
             PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
 
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = retornaCliente(clienteId);
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
         estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
 
@@ -71,8 +71,8 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public PedidoResponseDTO atualizar(Long pedidoId, String clienteCodigoAcesso,
             PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
-        Cliente cliente = clienteRepository.findById(pedido.getClienteId()).get();
+        Pedido pedido = retornaPedido(pedidoId);
+        Cliente cliente = retornaCliente(pedido.getClienteId());
 
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
 
@@ -94,7 +94,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public List<Pedido> recuperaTodosPedidosCliente(Long clienteId, String codigoAcesso) {
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = retornaCliente(clienteId);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
 
         return pedidoRepository.findByClienteId(clienteId);
@@ -102,11 +102,11 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public Pedido recuperaPedidoPorIdCliente(Long pedidoId, Long clienteId, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = retornaPedido(pedidoId);
         if (!pedido.getClienteId().equals(clienteId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
         }
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = retornaCliente(clienteId);
 
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
 
@@ -115,8 +115,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public List<Pedido> recuperaTodosPedidosEstabelecimento(Long estabelecimentoId, String codigoAcesso) {
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-                .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Estabelecimento estabelecimento = retornaEstabelecimento(estabelecimentoId);
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
         return pedidoRepository.findByEstabelecimentoId(estabelecimentoId);
@@ -124,12 +123,11 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public Pedido recuperaPedidoPorIdEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = retornaPedido(pedidoId);
         if (!pedido.getEstabelecimentoId().equals(estabelecimentoId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
         }
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-                .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Estabelecimento estabelecimento = retornaEstabelecimento(estabelecimentoId);
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
         return pedido;
@@ -148,7 +146,7 @@ public class PedidoServiceImpl implements PedidoService {
                     .collect(Collectors.toList());
         }
 
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = retornaPedido(pedidoId);
 
         if (!pedido.getClienteId().equals(clienteId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
@@ -156,7 +154,7 @@ public class PedidoServiceImpl implements PedidoService {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
         }
 
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = retornaCliente(clienteId);
 
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
 
@@ -165,11 +163,11 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public void deletePorCliente(Long pedidoId, Long clienteId, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = retornaPedido(pedidoId);
         if (!pedido.getClienteId().equals(clienteId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
         }
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = retornaCliente(clienteId);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
 
         pedidoRepository.deleteById(pedidoId);
@@ -177,12 +175,11 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public void deletePorEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = retornaPedido(pedidoId);
         if (!pedido.getEstabelecimentoId().equals(estabelecimentoId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
         }
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-                .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Estabelecimento estabelecimento = retornaEstabelecimento(estabelecimentoId);
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
         this.pedidoRepository.deleteById(pedidoId);
@@ -191,17 +188,13 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public void deleteTodosPedidosEstabelecimento(Long estabelecimentoId) {
         estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
-
         pedidoRepository.deleteByEstabelecimentoId(estabelecimentoId);
-        ;
     }
 
     @Override
     public void deleteTodosPedidosCliente(Long clienteId) {
         clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
-
         pedidoRepository.deleteByClienteId(clienteId);
-        ;
     }
 
     private Double calculaPrecoPedido(List<Pizza> pizzas) {
@@ -233,9 +226,9 @@ public class PedidoServiceImpl implements PedidoService {
         if (!metodosDisponiveis.contains(metodoPagamento)) {
             throw new MetodoDePagamentoIndisponivel();
         }
-        Cliente cliente = clienteRepository.findById(clientId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = retornaCliente(clientId);
         Util.verificaCodAcesso(codigoAcessoCliente, cliente.getCodigoAcesso());
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = retornaPedido(pedidoId);
 
         pedido.setStatusPagamento(true);
         if (metodoPagamento.equals("PIX")) {
@@ -250,23 +243,27 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public PedidoResponseDTO confirmarEntrega(Long pedidoId, Long clienteId, String clienteCodigoAcesso) {
-        Pedido pedido = this.pedidoRepository
-                .findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
-        Cliente cliente = this.clienteRepository
-                .findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Pedido pedido = retornaPedido(pedidoId);
+        Cliente cliente = retornaCliente(clienteId);
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
 
         pedido.setStatusEntrega("Pedido entregue");
-        Estabelecimento estabelecimento = this.estabelecimentoRepository
-                .findById(pedido.getEstabelecimentoId())
-                .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Estabelecimento estabelecimento = retornaEstabelecimento(pedido.getEstabelecimentoId());
         notificate(pedido.getEstabelecimentoId(), pedidoId);
         return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
 
+
     private void notificate(Long estabelecimentoId, Long pedidoId) {
         System.out.println("Olá estabelecimento " + estabelecimentoId + ", o pedido " + pedidoId + " mudou de status para Pedido entregue!");
     }
-
-
+    private Cliente retornaCliente(Long clienteId){
+        return this.clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+    }
+    private Estabelecimento retornaEstabelecimento(Long estabelecimentoId){
+        return this.estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+    }
+    private Pedido retornaPedido (Long pedidoId){
+        return this.pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+    }
 }
