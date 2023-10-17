@@ -85,7 +85,7 @@ public class SaborServiceImpl implements SaborService {
       SaborDisponibilidadePatchDTO disponibilidadePatchDTO) {
     estabelecimentoService.getEstabelecimento(codigoDeAcceso, estabelecimendoId);
 
-    Sabor sabor = saborRepository.findById(saborId).orElseThrow(() -> new SaborNaoEncontrado());
+    Sabor sabor = retornaSabor(saborId);
     sabor.setDisponivel(disponibilidadePatchDTO.getDisponivel());
 
     if (disponibilidadePatchDTO.getDisponivel()) {
@@ -100,6 +100,10 @@ public class SaborServiceImpl implements SaborService {
     if (clientesInteressados.size() > 0) {
       clientesInteressados.forEach(cliente -> this.notification.notificate(sabor.getNome(),cliente.getNome()));
     }
+  }
+
+  private Sabor retornaSabor(Long saborId){
+    return this.saborRepository.findById(saborId).orElseThrow(() -> new SaborNaoEncontrado());
   }
 
 }
