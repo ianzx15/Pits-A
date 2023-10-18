@@ -880,7 +880,7 @@ public class PedidoControllerTests {
        // Assert
        assertEquals(resultado.getStatusEntrega(), "Pedido entregue");
        assertTrue(outputStreamCaptor.toString()
-                 .trim().contains("Olá estabelecimento 1, o pedido 2 mudou de status para Pedido entregue!"));
+                 .trim().contains("Olá estabelecimento " + resultado.getEstabelecimentoId() + ", o pedido " + resultado.getId() + " mudou de status para Pedido entregue!"));
      }
    }
 
