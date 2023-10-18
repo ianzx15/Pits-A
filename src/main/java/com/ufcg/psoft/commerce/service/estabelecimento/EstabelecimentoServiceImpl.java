@@ -81,7 +81,6 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     public List<SaborCardapioDTO> getCardapio(Long id) {
         Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
                 .orElseThrow(EstabelecimentoNaoEncontrado::new);
-
         estabelecimento.getSabores().sort(Comparator.comparing(Sabor::getDisponivel).reversed());
         List<Sabor> sabores = estabelecimento.getSabores();
         return sabores.stream().map(sabor -> modelMapper.map(sabor, SaborCardapioDTO.class))

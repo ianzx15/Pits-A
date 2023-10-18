@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,8 +60,12 @@ public class PedidoControllerTests {
   Pedido pedido1;
   PedidoPostPutRequestDTO pedidoPostPutRequestDTO;
 
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
   @BeforeEach
   void setup() {
+      System.setOut(new PrintStream(outputStreamCaptor));
     objectMapper.registerModule(new JavaTimeModule());
     estabelecimento = estabelecimentoRepository.save(Estabelecimento.builder()
         .codigoAcesso("654321")
@@ -125,6 +131,7 @@ public class PedidoControllerTests {
 
   @AfterEach
   void tearDown() {
+      System.setOut(standardOut);
     clienteRepository.deleteAll();
     estabelecimentoRepository.deleteAll();
     pedidoRepository.deleteAll();
@@ -872,6 +879,8 @@ public class PedidoControllerTests {
 
        // Assert
        assertEquals(resultado.getStatusEntrega(), "Pedido entregue");
+       assertTrue(outputStreamCaptor.toString()
+                 .trim().contains("Olá estabelecimento 1, o pedido 2 mudou de status para Pedido entregue!"));
      }
    }
 
