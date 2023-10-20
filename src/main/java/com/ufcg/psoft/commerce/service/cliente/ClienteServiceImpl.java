@@ -1,12 +1,12 @@
 package com.ufcg.psoft.commerce.service.cliente;
 
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
 import com.ufcg.psoft.commerce.dto.sabor.SaborResponseDTO;
 import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.sabor.SaborJaDisponivel;
-import com.ufcg.psoft.commerce.exception.sabor.SaborNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.model.Sabor;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
@@ -32,7 +32,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     ModelMapper modelMapper;
 
     public void delete(Long id, String codigoAcesso) {
-        Cliente cliente = retornaCliente(id);
+        Cliente cliente = RetornaEntidades.retornaCliente(id, this.clienteRepository);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
         this.clienteRepository.deleteById(id);
     }
@@ -54,7 +54,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     }
 
     public ClienteResponseDTO getOne(Long id) {
-        Cliente cliente = retornaCliente(id);
+        Cliente cliente = RetornaEntidades.retornaCliente(id, this.clienteRepository);
         return modelMapper.map(cliente, ClienteResponseDTO.class);
     }
 
@@ -70,7 +70,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     public SaborResponseDTO demonstrarInteresse(String codigoAcessoCliente, Long idCliente, Long idSabor) {
         Cliente cliente = this.getCliente(codigoAcessoCliente, idCliente);
 
-        Sabor sabor = retornaSabor(idSabor);
+        Sabor sabor = RetornaEntidades.retornaSabor(idSabor, this.saborRepository);
         if (sabor.getDisponivel()) {
             throw new SaborJaDisponivel();
         }
@@ -80,7 +80,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     }
 
     public Cliente getCliente (String codigoAcesso, Long id) {
-        Cliente cliente = retornaCliente(id);
+        Cliente cliente = RetornaEntidades.retornaCliente(id, this.clienteRepository);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
         return cliente;
     }
@@ -90,11 +90,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
         System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
     }
 
-    private Cliente retornaCliente(Long clienteId){
-        return this.clienteRepository.findById(clienteId).orElseThrow(ClienteNotFoundException::new);
-    }
 
-    private Sabor retornaSabor(Long saborId ){
-        return this.saborRepository.findById(saborId).orElseThrow(SaborNaoEncontrado::new);
-    }
+
+
 }

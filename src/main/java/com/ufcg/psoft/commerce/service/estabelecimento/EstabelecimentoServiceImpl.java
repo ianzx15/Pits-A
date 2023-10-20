@@ -1,5 +1,6 @@
 package com.ufcg.psoft.commerce.service.estabelecimento;
 
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoResponseDTO;
@@ -69,8 +70,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     public Estabelecimento getEstabelecimento(String codigoAcesso, Long id) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
-                .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(id, this.estabelecimentoRepository);
 
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
@@ -79,8 +79,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
 
     public List<SaborCardapioDTO> getCardapio(Long id) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
-                .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(id, this.estabelecimentoRepository);
         estabelecimento.getSabores().sort(Comparator.comparing(Sabor::getDisponivel).reversed());
         List<Sabor> sabores = estabelecimento.getSabores();
         return sabores.stream().map(sabor -> modelMapper.map(sabor, SaborCardapioDTO.class))
@@ -88,8 +87,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     public List<SaborCardapioDTO> getCardapioPorTipo(Long id, String tipo) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
-                .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(id, this.estabelecimentoRepository);
         List<Sabor> sabores = estabelecimento.getSabores();
 
         return sabores.stream()
