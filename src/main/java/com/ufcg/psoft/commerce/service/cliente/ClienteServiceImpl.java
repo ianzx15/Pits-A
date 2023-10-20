@@ -75,6 +75,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
             throw new SaborJaDisponivel();
         }
         sabor.getClientesInteressados().add(cliente);
+        saborRepository.save(sabor);
 
         return modelMapper.map(sabor, SaborResponseDTO.class);
     }
@@ -88,10 +89,5 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     @Override
     public void notificate(String sabor, String nomeCliente) {
         System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
-        System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
     }
-
-
-
-
 }
