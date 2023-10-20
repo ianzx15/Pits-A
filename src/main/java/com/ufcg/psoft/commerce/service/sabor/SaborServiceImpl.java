@@ -97,7 +97,7 @@ public class SaborServiceImpl implements SaborService {
 
   private void notificaDisponibilidade(Sabor sabor) {
     Set<Cliente> clientesInteressados = sabor.getClientesInteressados();
-    if (clientesInteressados.size() > 0) {
+    if (!clientesInteressados.isEmpty()) {
       clientesInteressados.forEach(cliente -> this.notification.notificate(sabor.getNome(),cliente.getNome()));
     }
   }

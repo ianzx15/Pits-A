@@ -88,6 +88,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     @Override
     public void notificate(String sabor, String nomeCliente) {
         System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
+        System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
     }
 
     private Cliente retornaCliente(Long clienteId){
