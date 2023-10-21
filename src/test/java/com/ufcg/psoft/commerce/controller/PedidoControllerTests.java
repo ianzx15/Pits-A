@@ -977,7 +977,7 @@ public class PedidoControllerTests {
         }
 
         @Test
-        @DisplayName("Quando pedido status muda de Pedido recebido para Pedido pronto")
+        @DisplayName("Quando pedido status muda de Pedido em preparo para Pedido pronto")
         void mudaStatusParaPedidoPronto() throws Exception {
 
             pedido1.setStatusEntrega("Pedido em preparo");
