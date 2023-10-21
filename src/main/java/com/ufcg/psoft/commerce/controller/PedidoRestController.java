@@ -135,4 +135,11 @@ public class PedidoRestController {
             .body(pedidoService.confirmarEntrega(pedidoId, clientId, clienteCodigoAcesso));
   }
 
+  @PatchMapping("/{pedidoId}/status-pedido/pronto")
+  ResponseEntity<?> pedidoPronto(@PathVariable Long pedidoId) {
+    pedidoService.pedidoPronto(pedidoId);
+    return ResponseEntity.ok("Pedido Pronto");
+  }
+
+
 }

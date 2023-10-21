@@ -19,36 +19,64 @@ public class ClienteRestController {
     ClienteServiceImpl clienteService;
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getOne(@PathVariable("id") @Valid Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.clienteService.getOne(id));
+    ResponseEntity<?> getOne(
+            @PathVariable("id") @Valid Long id
+    ){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(this.clienteService.getOne(id));
     }
 
     @GetMapping
-    ResponseEntity<?> getAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(this.clienteService.getAll());
+    ResponseEntity<?> getAll(){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(this.clienteService.getAll());
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> post(@RequestBody @Valid ClientePostPutRequestDTO clientePostPutRequestDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.clienteService.post(clientePostPutRequestDTO));
+    public ResponseEntity<?> post(
+            @RequestBody @Valid ClientePostPutRequestDTO clientePostPutRequestDTO
+    ){
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(this.clienteService.post(clientePostPutRequestDTO));
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> put(@PathVariable("id") Long id, @Valid @RequestBody ClientePostPutRequestDTO clientePostPutRequestDTO, @RequestParam String codigoAcesso) {
-        return ResponseEntity.status(HttpStatus.OK).body(this.clienteService.put(id, clientePostPutRequestDTO, codigoAcesso));
+   public ResponseEntity<?> put(
+            @PathVariable("id")  Long id, @Valid @RequestBody ClientePostPutRequestDTO clientePostPutRequestDTO, @RequestParam String codigoAcesso
+    ){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(this.clienteService.put(id, clientePostPutRequestDTO, codigoAcesso));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> delete(@PathVariable("id") @Valid Long id, @RequestParam String codigoAcesso) {
+    public ResponseEntity<?> delete(
+            @PathVariable("id") @Valid Long id, @RequestParam String codigoAcesso
+    ){
         this.clienteService.delete(id, codigoAcesso);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return  ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     @PutMapping("/{clienteId}/demonstrarInteresse")
-    public ResponseEntity<?> demonstrarInteresse(@PathVariable("clienteId") @Valid Long clienteId, @RequestParam String codigoAcesso, @RequestParam Long saborId) {
-        return ResponseEntity.status(HttpStatus.OK).body(clienteService.demonstrarInteresse(codigoAcesso, clienteId, saborId));
+    public ResponseEntity<?> demonstrarInteresse(
+        @PathVariable("clienteId") @Valid Long clienteId,
+        @RequestParam String codigoAcesso,
+        @RequestParam Long saborId
+    ){
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(clienteService.demonstrarInteresse(codigoAcesso, clienteId, saborId));
     }
+
+
+
+
 }
