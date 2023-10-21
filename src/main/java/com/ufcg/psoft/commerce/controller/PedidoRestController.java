@@ -136,10 +136,7 @@ public class PedidoRestController {
   }
 
   @PatchMapping("/{pedidoId}/status-pedido/pronto")
-  ResponseEntity<?> pedidoPronto(@PathVariable Long pedidoId) {
-    pedidoService.pedidoPronto(pedidoId);
-    return ResponseEntity.ok("Pedido Pronto");
+  ResponseEntity<PedidoResponseDTO> pedidoPronto(@PathVariable Long pedidoId) {
+    return ResponseEntity.ok(pedidoService.pedidoPronto(pedidoId));
   }
-
-
 }

@@ -238,7 +238,7 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
             pedido.setPreco(pedido.getPreco() * 0.975);
         }
 
-        pedido.setEnderecoEntrega("Pedido em preparo");
+        pedido.setStatusEntrega("Pedido em preparo");
         pedidoRepository.flush();
 
         return modelMapper.map(pedido, PedidoResponseDTO.class);
@@ -259,9 +259,12 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
     }
 
     @Override
-    public void pedidoPronto(Long pedidoId) {
-        RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository).setStatusEntrega("Pedido pronto");
+    public PedidoResponseDTO pedidoPronto(Long pedidoId) {
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
+        pedido.setStatusEntrega("Pedido pronto");
         this.pedidoRepository.flush();
+
+        return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
 
     @Override

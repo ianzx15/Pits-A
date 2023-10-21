@@ -37,5 +37,5 @@ public interface PedidoService {
 
     public PedidoResponseDTO confirmarEntrega(Long pedidoId, Long clienteId, String clienteCodigoAcesso);
 
-    public void pedidoPronto(Long pedidoId);
+    public PedidoResponseDTO pedidoPronto(Long pedidoId);
 }
