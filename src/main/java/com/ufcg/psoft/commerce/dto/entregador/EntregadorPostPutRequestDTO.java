@@ -2,6 +2,7 @@ package com.ufcg.psoft.commerce.dto.entregador;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.notations.ValidadorVeiculo;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -34,4 +35,10 @@ public class EntregadorPostPutRequestDTO {
     @JsonProperty("codigoAcesso")
     @Size(min = 6, max = 6, message = "Codigo de acesso deve ter exatamente 6 digitos numericos")
     private String codigoAcesso;
+
+    @JsonProperty("statusAprovacao")
+    private boolean statusAprovacao;
+
+    @JsonProperty("disponilibidade")
+    private boolean disponibilidade;
 }
