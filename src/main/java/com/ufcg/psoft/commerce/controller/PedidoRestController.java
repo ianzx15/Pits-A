@@ -129,10 +129,22 @@ public class PedidoRestController {
 
   @PutMapping("/{pedidoId}/{clientId}/cliente-confirmar-entrega")
   ResponseEntity<?> confirmarEntrega(@PathVariable Long pedidoId, @PathVariable Long clientId,
-                                     @RequestParam String clienteCodigoAcesso) {
+      @RequestParam String clienteCodigoAcesso) {
 
     return ResponseEntity.ok()
-            .body(pedidoService.confirmarEntrega(pedidoId, clientId, clienteCodigoAcesso));
+        .body(pedidoService.confirmarEntrega(pedidoId, clientId, clienteCodigoAcesso));
+  }
+
+  @GetMapping("/pedidos-cliente-estabelecimento/{clientId}/{estabelecimentoId}/{statusEntrega}")
+  ResponseEntity<List<PedidoResponseDTO>> recuperarHistoricoFiltradoPorEntrega(@PathVariable Long clientId,
+      @PathVariable Long estabelecimentoId,
+      @PathVariable String statusEntrega,
+      @RequestParam String clienteCodigoAcesso) {
+
+    return ResponseEntity.ok()
+        .body(
+            pedidoService.recuperaHistoricoFiltradoPorEntrega(clientId, estabelecimentoId, clienteCodigoAcesso,
+                statusEntrega));
   }
 
 }

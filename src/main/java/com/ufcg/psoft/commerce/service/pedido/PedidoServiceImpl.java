@@ -141,9 +141,14 @@ public class PedidoServiceImpl implements PedidoService, Notification {
         clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
         if (pedidoId == null) {
             List<Pedido> pedidos = pedidoRepository.findByClienteIdAndEstabelecimentoId(clienteId, estabelecimentoId);
-            return pedidos.stream()
-                    .map(pedido -> modelMapper
-                            .map(pedido, PedidoResponseDTO.class))
+            return pedidos.stream().sorted((p1, p2) -> {
+                if (!p1.getStatusEntrega().equals("Pedido entregue")) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }).map(p -> modelMapper
+                    .map(p, PedidoResponseDTO.class))
                     .collect(Collectors.toList());
         }
 
@@ -255,6 +260,18 @@ public class PedidoServiceImpl implements PedidoService, Notification {
     }
 
     @Override
+    public List<PedidoResponseDTO> recuperaHistoricoFiltradoPorEntrega(Long clientId, Long estabelecientoId,
+            String codigoAcessoCliente, String statusEntrega) {
+        Cliente cliente = RetornaEntidades.retornaCliente(clientId, this.clienteRepository);
+        Util.verificaCodAcesso(codigoAcessoCliente, cliente.getCodigoAcesso());
+        List<Pedido> pedidos = pedidoRepository.findByClienteIdAndEstabelecimentoIdAndStatusEntrega(clientId,
+                estabelecientoId, statusEntrega);
+
+        return pedidos.stream().map(p -> modelMapper
+                .map(p, PedidoResponseDTO.class))
+                .collect(Collectors.toList());
+
+    }
     public void notificate(Long estabelecimentoId, Long pedidoId) {
         System.out.println("Olá estabelecimento " + estabelecimentoId + ", o pedido " + pedidoId + " mudou de status para Pedido entregue!");
     }
