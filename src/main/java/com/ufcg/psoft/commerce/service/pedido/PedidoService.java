@@ -2,6 +2,8 @@ package com.ufcg.psoft.commerce.service.pedido;
 
 import java.util.List;
 
+import com.ufcg.psoft.commerce.dto.entregador.EntregadorGetRequestDTO;
+import com.ufcg.psoft.commerce.dto.pedido.PedidoEntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.model.Pedido;
@@ -37,5 +39,7 @@ public interface PedidoService {
 
     public PedidoResponseDTO confirmarEntrega(Long pedidoId, Long clienteId, String clienteCodigoAcesso);
 
-    public PedidoResponseDTO pedidoPronto(Long pedidoId);
+    public PedidoResponseDTO preparaPedido(Long pedidoId);
+
+    public PedidoEntregadorResponseDTO atribuiEntregador(Long pedidoId, String estabelecimentoCodigoAcesso, Long estabelecimentoId);
 }

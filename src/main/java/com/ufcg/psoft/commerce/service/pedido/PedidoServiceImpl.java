@@ -2,14 +2,17 @@ package com.ufcg.psoft.commerce.service.pedido;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import com.ufcg.psoft.commerce.Util.RetornaEntidades;
-import com.ufcg.psoft.commerce.model.Estabelecimento;
+import com.ufcg.psoft.commerce.dto.pedido.PedidoEntregadorResponseDTO;
+import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoCodAcessoException;
+import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoProntoException;
+import com.ufcg.psoft.commerce.exception.pedido.SemEntregadoresDispException;
+import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.observer.NotificaEntregaPedido;
+import com.ufcg.psoft.commerce.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
@@ -17,13 +20,6 @@ import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.pedido.MetodoDePagamentoIndisponivel;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPertenceAEntidade;
-import com.ufcg.psoft.commerce.model.Cliente;
-import com.ufcg.psoft.commerce.model.Pedido;
-import com.ufcg.psoft.commerce.model.Pizza;
-import com.ufcg.psoft.commerce.repository.ClienteRepository;
-import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
-import com.ufcg.psoft.commerce.repository.PedidoRepository;
-import com.ufcg.psoft.commerce.repository.PizzaRepository;
 
 @Service
 public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
@@ -39,6 +35,9 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
 
     @Autowired
     PizzaRepository pizzaRepository;
+
+    @Autowired
+    EntregadorRepository entregadorRepository;
 
     @Autowired
     EstabelecimentoRepository estabelecimentoRepository;
@@ -259,12 +258,42 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
     }
 
     @Override
-    public PedidoResponseDTO pedidoPronto(Long pedidoId) {
+    public PedidoResponseDTO preparaPedido(Long pedidoId) {
         Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
         pedido.setStatusEntrega("Pedido pronto");
         this.pedidoRepository.flush();
 
         return modelMapper.map(pedido, PedidoResponseDTO.class);
+    }
+
+    @Override
+    public PedidoEntregadorResponseDTO atribuiEntregador(Long pedidoId, String estabelecimentoCodigoAcesso, Long estabelecimentoId) {
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, estabelecimentoRepository);
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
+
+        if (!estabelecimentoCodigoAcesso.equals(estabelecimento.getCodigoAcesso())) {
+            throw new EstabelecimentoCodAcessoException();
+        }
+
+        if (!pedido.getStatusEntrega().equals("Pedido pronto")) {
+            throw new PedidoNaoProntoException();
+        }
+
+
+        if (estabelecimento.getEntregadoresDisponiveis().isEmpty()) {
+            throw new SemEntregadoresDispException();
+        }
+
+        Entregador entregador = estabelecimento.getEntregadoresDisponiveis().get(0);
+
+        entregador.setStatusAprovacao(true);
+        pedido.setEntregadorId(entregador.getId());
+        pedido.setStatusEntrega("Pedido em rota");
+
+        this.entregadorRepository.flush();
+        this.pedidoRepository.flush();
+
+        return modelMapper.map(pedido, PedidoEntregadorResponseDTO.class);
     }
 
     @Override
