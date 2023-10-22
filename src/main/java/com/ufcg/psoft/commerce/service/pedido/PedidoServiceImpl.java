@@ -9,6 +9,7 @@ import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoProntoException;
 import com.ufcg.psoft.commerce.exception.pedido.SemEntregadoresDispException;
 import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.observer.NotificaEntregaPedido;
+import com.ufcg.psoft.commerce.observer.NotificaPedidoEmRota;
 import com.ufcg.psoft.commerce.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import com.ufcg.psoft.commerce.exception.pedido.MetodoDePagamentoIndisponivel;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPertenceAEntidade;
 
 @Service
-public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
+public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, NotificaPedidoEmRota {
 
     @Autowired
     ModelMapper modelMapper;
@@ -279,7 +280,6 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
             throw new PedidoNaoProntoException();
         }
 
-
         if (estabelecimento.getEntregadoresDisponiveis().isEmpty()) {
             throw new SemEntregadoresDispException();
         }
@@ -289,6 +289,7 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
         entregador.setStatusAprovacao(true);
         pedido.setEntregadorId(entregador.getId());
         pedido.setStatusEntrega("Pedido em rota");
+        notificaEmRota(pedidoId, estabelecimentoId, entregador);
 
         this.entregadorRepository.flush();
         this.pedidoRepository.flush();
@@ -299,6 +300,11 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido {
     @Override
     public void notificaEntrega(Long estabelecimentoId, Long pedidoId) {
         System.out.println("Olá estabelecimento " + estabelecimentoId + ", o pedido " + pedidoId + " mudou de status para Pedido entregue!");
+    }
+
+    @Override
+    public void notificaEmRota(Long pedidoId, Long clientId, Entregador entregador) {
+        System.out.println("Olá Cliente, " + clientId +  " o seu pedido " + pedidoId + " está em rota, o entregador responsável é: " + entregador.toString());
     }
 
 }

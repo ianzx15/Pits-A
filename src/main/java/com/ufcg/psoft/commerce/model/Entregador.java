@@ -61,4 +61,15 @@ public class Entregador {
     @OneToMany(mappedBy = "entregador", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Associacao> associacoes;
+
+
+    public String toString() {
+        return (
+            "\n Nome entregador: " + this.nome + 
+            "\n Dados do veiculo: " + 
+            "\n Placa: " + this.placaVeiculo + 
+            "\n Tipo: " + this.tipoVeiculo + 
+            "\n Cor: " + this.corVeiculo
+        );
+    }
 }
