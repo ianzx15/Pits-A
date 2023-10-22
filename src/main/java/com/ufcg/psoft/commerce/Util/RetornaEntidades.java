@@ -7,11 +7,6 @@ import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.sabor.SaborNaoEncontrado;
 import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 
 public class RetornaEntidades {
 

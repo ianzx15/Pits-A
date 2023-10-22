@@ -2,7 +2,6 @@ package com.ufcg.psoft.commerce.service.pedido;
 
 import java.util.List;
 
-import com.ufcg.psoft.commerce.dto.entregador.EntregadorGetRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoEntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
