@@ -36,6 +36,8 @@ public interface PedidoService {
   public PedidoResponseDTO confirmarPagamento(Long clientId, Long pedidoId, String codigoAcessoCliente,
       String metodoPagamento);
 
+  public List<PedidoResponseDTO> recuperaHistoricoFiltradoPorEntrega(Long clientId, Long estabelecientoId, String codigoAcessoCliente, String statusEntrega);
+
   public PedidoResponseDTO confirmarEntrega(Long pedidoId, Long clienteId, String clienteCodigoAcesso);
 
   public PedidoResponseDTO preparaPedido(Long pedidoId);

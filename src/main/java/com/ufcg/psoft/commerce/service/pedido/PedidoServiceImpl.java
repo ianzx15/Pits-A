@@ -180,6 +180,20 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
     }
 
     @Override
+    public List<PedidoResponseDTO> recuperaHistoricoFiltradoPorEntrega(Long clientId, Long estabelecientoId,
+            String codigoAcessoCliente, String statusEntrega) {
+        Cliente cliente = RetornaEntidades.retornaCliente(clientId, this.clienteRepository);
+        Util.verificaCodAcesso(codigoAcessoCliente, cliente.getCodigoAcesso());
+        List<Pedido> pedidos = pedidoRepository.findByClienteIdAndEstabelecimentoIdAndStatusEntrega(clientId,
+                estabelecientoId, statusEntrega);
+
+        return pedidos.stream().map(p -> modelMapper
+                .map(p, PedidoResponseDTO.class))
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
     public void deletePorEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso) {
         Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
         if (!pedido.getEstabelecimentoId().equals(estabelecimentoId)) {
