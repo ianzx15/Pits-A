@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.model.Cliente;
-import com.ufcg.psoft.commerce.service.cliente.Notification;
+import com.ufcg.psoft.commerce.observer.NotificaDispSabor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class SaborServiceImpl implements SaborService {
   @Autowired
   private ModelMapper modelMapper;
   @Autowired
-  private Notification notification;
+  private NotificaDispSabor notificaDispSabor;
 
   @Override
   public SaborResponseDTO recuperar(Long estabelecimendoId, String codigoDeAcceso, Long saborId) {
@@ -100,7 +100,7 @@ public class SaborServiceImpl implements SaborService {
     Set<Cliente> clientesInteressados = sabor.getClientesInteressados();
 
     if (!clientesInteressados.isEmpty()) {
-      clientesInteressados.forEach(cliente -> this.notification.notificate(sabor.getNome(),cliente.getNome()));
+      clientesInteressados.forEach(cliente -> this.notificaDispSabor.notificaDispSabor(sabor.getNome(),cliente.getNome()));
     }
   }
 

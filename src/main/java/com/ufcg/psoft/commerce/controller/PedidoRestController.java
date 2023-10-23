@@ -2,6 +2,7 @@ package com.ufcg.psoft.commerce.controller;
 
 import java.util.List;
 
+import com.ufcg.psoft.commerce.dto.pedido.PedidoEntregadorResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -147,4 +148,16 @@ public class PedidoRestController {
                 statusEntrega));
   }
 
+  @PatchMapping("/{pedidoId}/status-pedido/pronto")
+  ResponseEntity<PedidoResponseDTO> pedidoPronto(@PathVariable Long pedidoId) {
+    return ResponseEntity.ok(pedidoService.preparaPedido(pedidoId));
+  }
+
+  @PutMapping("/{pedidoId}/associar-pedido-entregador")
+  ResponseEntity<PedidoEntregadorResponseDTO> associarEntregadorPedido(
+          @PathVariable Long pedidoId,
+          @RequestParam String estabelecimentoCodigoAcesso,
+          @RequestParam Long estabelecimentoId) {
+    return ResponseEntity.ok(pedidoService.atribuiEntregador(pedidoId, estabelecimentoCodigoAcesso, estabelecimentoId));
+  }
 }

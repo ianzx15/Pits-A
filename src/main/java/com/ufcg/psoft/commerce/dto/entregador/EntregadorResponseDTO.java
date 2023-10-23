@@ -36,4 +36,10 @@ public class EntregadorResponseDTO {
     @JsonProperty("codigoAcesso")
     @NotBlank
     private String codigoAcesso;
+
+    @JsonProperty("statusAprovacao")
+    private boolean statusAprovacao;
+
+    @JsonProperty("disponilibidade")
+    private boolean disponibilidade;
 }

@@ -9,6 +9,7 @@ import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.sabor.SaborJaDisponivel;
 import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.model.Sabor;
+import com.ufcg.psoft.commerce.observer.NotificaDispSabor;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
 import com.ufcg.psoft.commerce.repository.SaborRepository;
 
@@ -20,7 +21,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-public class ClienteServiceImpl implements ClienteService, Notification {
+public class ClienteServiceImpl implements ClienteService, NotificaDispSabor {
 
     @Autowired
     ClienteRepository clienteRepository;
@@ -87,7 +88,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     }
 
     @Override
-    public void notificate(String sabor, String nomeCliente) {
+    public void notificaDispSabor(String sabor, String nomeCliente) {
         System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
     }
 }

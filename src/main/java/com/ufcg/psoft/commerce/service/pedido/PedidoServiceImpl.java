@@ -2,31 +2,28 @@ package com.ufcg.psoft.commerce.service.pedido;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import com.ufcg.psoft.commerce.Util.RetornaEntidades;
-import com.ufcg.psoft.commerce.model.Estabelecimento;
+import com.ufcg.psoft.commerce.dto.pedido.PedidoEntregadorResponseDTO;
+import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoCodAcessoException;
+import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoProntoException;
+import com.ufcg.psoft.commerce.exception.pedido.SemEntregadoresDispException;
+import com.ufcg.psoft.commerce.model.*;
+import com.ufcg.psoft.commerce.observer.NotificaEntregaPedido;
+import com.ufcg.psoft.commerce.observer.NotificaPedidoEmRota;
+import com.ufcg.psoft.commerce.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.pedido.MetodoDePagamentoIndisponivel;
-import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPertenceAEntidade;
-import com.ufcg.psoft.commerce.model.Cliente;
-import com.ufcg.psoft.commerce.model.Pedido;
-import com.ufcg.psoft.commerce.model.Pizza;
-import com.ufcg.psoft.commerce.repository.ClienteRepository;
-import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
-import com.ufcg.psoft.commerce.repository.PedidoRepository;
-import com.ufcg.psoft.commerce.repository.PizzaRepository;
 
 @Service
-public class PedidoServiceImpl implements PedidoService, Notification {
+public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, NotificaPedidoEmRota {
 
     @Autowired
     ModelMapper modelMapper;
@@ -39,6 +36,9 @@ public class PedidoServiceImpl implements PedidoService, Notification {
 
     @Autowired
     PizzaRepository pizzaRepository;
+
+    @Autowired
+    EntregadorRepository entregadorRepository;
 
     @Autowired
     EstabelecimentoRepository estabelecimentoRepository;
@@ -242,6 +242,8 @@ public class PedidoServiceImpl implements PedidoService, Notification {
         } else if (metodoPagamento.equals("DEBITO")) {
             pedido.setPreco(pedido.getPreco() * 0.975);
         }
+
+        pedido.setStatusEntrega("Pedido em preparo");
         pedidoRepository.flush();
 
         return modelMapper.map(pedido, PedidoResponseDTO.class);
@@ -254,25 +256,61 @@ public class PedidoServiceImpl implements PedidoService, Notification {
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
 
         pedido.setStatusEntrega("Pedido entregue");
-        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(pedido.getEstabelecimentoId(), this.estabelecimentoRepository);
-        notificate(pedido.getEstabelecimentoId(), pedidoId);
+        RetornaEntidades.retornaEstabelecimento(pedido.getEstabelecimentoId(), this.estabelecimentoRepository);
+        this.pedidoRepository.flush();
+        notificaEntrega(pedido.getEstabelecimentoId(), pedidoId);
+
         return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
 
     @Override
-    public List<PedidoResponseDTO> recuperaHistoricoFiltradoPorEntrega(Long clientId, Long estabelecientoId,
-            String codigoAcessoCliente, String statusEntrega) {
-        Cliente cliente = RetornaEntidades.retornaCliente(clientId, this.clienteRepository);
-        Util.verificaCodAcesso(codigoAcessoCliente, cliente.getCodigoAcesso());
-        List<Pedido> pedidos = pedidoRepository.findByClienteIdAndEstabelecimentoIdAndStatusEntrega(clientId,
-                estabelecientoId, statusEntrega);
+    public PedidoResponseDTO preparaPedido(Long pedidoId) {
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
+        pedido.setStatusEntrega("Pedido pronto");
+        this.pedidoRepository.flush();
 
-        return pedidos.stream().map(p -> modelMapper
-                .map(p, PedidoResponseDTO.class))
-                .collect(Collectors.toList());
-
+        return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
-    public void notificate(Long estabelecimentoId, Long pedidoId) {
+
+    @Override
+    public PedidoEntregadorResponseDTO atribuiEntregador(Long pedidoId, String estabelecimentoCodigoAcesso, Long estabelecimentoId) {
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, estabelecimentoRepository);
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
+
+        if (!estabelecimentoCodigoAcesso.equals(estabelecimento.getCodigoAcesso())) {
+            throw new EstabelecimentoCodAcessoException();
+        }
+
+        if (!pedido.getStatusEntrega().equals("Pedido pronto")) {
+            throw new PedidoNaoProntoException();
+        }
+
+        if (estabelecimento.getEntregadoresDisponiveis().isEmpty()) {
+            throw new SemEntregadoresDispException();
+        }
+
+        Entregador entregador = estabelecimento.getEntregadoresDisponiveis().get(0);
+
+        entregador.setStatusAprovacao(true);
+        pedido.setEntregadorId(entregador.getId());
+        pedido.setStatusEntrega("Pedido em rota");
+        notificaEmRota(pedidoId, estabelecimentoId, entregador);
+
+        this.entregadorRepository.flush();
+        this.pedidoRepository.flush();
+
+        return modelMapper.map(pedido, PedidoEntregadorResponseDTO.class);
+    }
+
+    @Override
+    public void notificaEntrega(Long estabelecimentoId, Long pedidoId) {
+
         System.out.println("Olá estabelecimento " + estabelecimentoId + ", o pedido " + pedidoId + " mudou de status para Pedido entregue!");
     }
+
+    @Override
+    public void notificaEmRota(Long pedidoId, Long clientId, Entregador entregador) {
+        System.out.println("Olá Cliente, " + clientId +  " o seu pedido " + pedidoId + " está em rota, o entregador responsável é: " + entregador.toString());
+    }
+
 }
