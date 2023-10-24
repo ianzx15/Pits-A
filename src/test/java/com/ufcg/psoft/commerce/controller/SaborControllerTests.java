@@ -7,7 +7,6 @@ import com.ufcg.psoft.commerce.dto.sabor.SaborDisponibilidadePatchDTO;
 import com.ufcg.psoft.commerce.dto.sabor.SaborPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.sabor.SaborResponseDTO;
 import com.ufcg.psoft.commerce.exception.CustomErrorType;
-import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.model.Sabor;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
@@ -15,7 +14,6 @@ import com.ufcg.psoft.commerce.repository.SaborRepository;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
 
 import com.ufcg.psoft.commerce.service.cliente.ClienteServiceImpl;
-import com.ufcg.psoft.commerce.service.sabor.SaborServiceImpl;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
