@@ -1,21 +1,19 @@
 package com.ufcg.psoft.commerce.dto.pedido;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ufcg.psoft.commerce.model.Pizza;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PedidoResponseDTO {
-
+public class PedidoEntregadorResponseDTO {
     @JsonProperty("id")
     private Long id;
 
@@ -40,4 +38,6 @@ public class PedidoResponseDTO {
     @JsonProperty("statusEntrega")
     private String statusEntrega;
 
+    @JsonProperty("entregadorId")
+    private Long entregadorId;
 }

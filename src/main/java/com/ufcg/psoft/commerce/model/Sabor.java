@@ -2,15 +2,7 @@ package com.ufcg.psoft.commerce.model;
 
 import java.util.Set;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,8 +37,12 @@ public class Sabor {
   @PrimaryKeyJoinColumn
   private Estabelecimento estabelecimento;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JoinTable(name = "interesse", joinColumns = {
+          @JoinColumn(name = "cliente_id")
+  }, inverseJoinColumns = {
+          @JoinColumn(name = "sabor_id")
+  })
   @PrimaryKeyJoinColumn
   private Set<Cliente> clientesInteressados;
-
 }

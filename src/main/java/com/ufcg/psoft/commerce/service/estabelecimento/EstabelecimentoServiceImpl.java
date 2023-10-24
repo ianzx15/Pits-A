@@ -1,20 +1,16 @@
 package com.ufcg.psoft.commerce.service.estabelecimento;
 
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.estabelecimento.EstabelecimentoResponseDTO;
 import com.ufcg.psoft.commerce.dto.sabor.SaborCardapioDTO;
-import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.model.Sabor;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
-import com.ufcg.psoft.commerce.repository.SaborRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,8 +65,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     public Estabelecimento getEstabelecimento(String codigoAcesso, Long id) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
-                .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(id, this.estabelecimentoRepository);
 
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
@@ -79,9 +74,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
 
 
     public List<SaborCardapioDTO> getCardapio(Long id) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
-                .orElseThrow(EstabelecimentoNaoEncontrado::new);
-
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(id, this.estabelecimentoRepository);
         estabelecimento.getSabores().sort(Comparator.comparing(Sabor::getDisponivel).reversed());
         List<Sabor> sabores = estabelecimento.getSabores();
         return sabores.stream().map(sabor -> modelMapper.map(sabor, SaborCardapioDTO.class))
@@ -89,8 +82,7 @@ public class EstabelecimentoServiceImpl implements EstabelecimentoService {
     }
 
     public List<SaborCardapioDTO> getCardapioPorTipo(Long id, String tipo) {
-        Estabelecimento estabelecimento = this.estabelecimentoRepository.findById(id)
-                .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(id, this.estabelecimentoRepository);
         List<Sabor> sabores = estabelecimento.getSabores();
 
         return sabores.stream()

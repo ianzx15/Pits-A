@@ -34,4 +34,10 @@ public class EntregadorPostPutRequestDTO {
     @JsonProperty("codigoAcesso")
     @Size(min = 6, max = 6, message = "Codigo de acesso deve ter exatamente 6 digitos numericos")
     private String codigoAcesso;
+
+    @JsonProperty("statusAprovacao")
+    private boolean statusAprovacao;
+
+    @JsonProperty("disponilibidade")
+    private boolean disponibilidade;
 }

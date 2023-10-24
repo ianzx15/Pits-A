@@ -1,14 +1,15 @@
 package com.ufcg.psoft.commerce.service.cliente;
 
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.cliente.ClientePostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.cliente.ClienteResponseDTO;
 import com.ufcg.psoft.commerce.dto.sabor.SaborResponseDTO;
 import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.sabor.SaborJaDisponivel;
-import com.ufcg.psoft.commerce.exception.sabor.SaborNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.model.Sabor;
+import com.ufcg.psoft.commerce.observer.NotificaDispSabor;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
 import com.ufcg.psoft.commerce.repository.SaborRepository;
 
@@ -20,7 +21,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-public class ClienteServiceImpl implements ClienteService, Notification {
+public class ClienteServiceImpl implements ClienteService, NotificaDispSabor {
 
     @Autowired
     ClienteRepository clienteRepository;
@@ -32,7 +33,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     ModelMapper modelMapper;
 
     public void delete(Long id, String codigoAcesso) {
-        Cliente cliente = this.clienteRepository.findById(id).orElseThrow(ClienteNotFoundException::new);
+        Cliente cliente = RetornaEntidades.retornaCliente(id, this.clienteRepository);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
         this.clienteRepository.deleteById(id);
     }
@@ -54,7 +55,7 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     }
 
     public ClienteResponseDTO getOne(Long id) {
-        Cliente cliente = this.clienteRepository.findById(id).orElseThrow(ClienteNotFoundException::new);
+        Cliente cliente = RetornaEntidades.retornaCliente(id, this.clienteRepository);
         return modelMapper.map(cliente, ClienteResponseDTO.class);
     }
 
@@ -70,23 +71,24 @@ public class ClienteServiceImpl implements ClienteService, Notification {
     public SaborResponseDTO demonstrarInteresse(String codigoAcessoCliente, Long idCliente, Long idSabor) {
         Cliente cliente = this.getCliente(codigoAcessoCliente, idCliente);
 
-        Sabor sabor = this.saborRepository.findById(idSabor).orElseThrow(SaborNaoEncontrado::new);
+        Sabor sabor = RetornaEntidades.retornaSabor(idSabor, this.saborRepository);
         if (sabor.getDisponivel()) {
             throw new SaborJaDisponivel();
         }
         sabor.getClientesInteressados().add(cliente);
+        saborRepository.save(sabor);
 
         return modelMapper.map(sabor, SaborResponseDTO.class);
     }
 
     public Cliente getCliente (String codigoAcesso, Long id) {
-        Cliente cliente = this.clienteRepository.findById(id).orElseThrow(ClienteNotFoundException::new);
+        Cliente cliente = RetornaEntidades.retornaCliente(id, this.clienteRepository);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
         return cliente;
     }
 
     @Override
-    public void notificate(String sabor, String nomeCliente) {
+    public void notificaDispSabor(String sabor, String nomeCliente) {
         System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
     }
 }

@@ -1,5 +1,6 @@
 package com.ufcg.psoft.commerce.service.entregador;
 
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorGetRequestDTO;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
@@ -40,7 +41,7 @@ public class EntregadorServices implements EntregadorServicesInterface {
 
     @Override
     public EntregadorGetRequestDTO getById(Long id) {
-        Entregador entregador = this.entregadorRepository.findById(id).orElseThrow(EntregadorNotFoundException::new);
+        Entregador entregador = RetornaEntidades.retornaEntregador(id, this.entregadorRepository);
         return modelMapper.map(entregador, EntregadorGetRequestDTO.class);
     }
 
@@ -63,7 +64,7 @@ public class EntregadorServices implements EntregadorServicesInterface {
 
     @Override
     public void delete(Long id, String codigoAcesso) {
-        Entregador entity = this.entregadorRepository.findById(id).orElseThrow(EntregadorNotFoundException::new);
+        Entregador entity = RetornaEntidades.retornaEntregador(id, this.entregadorRepository);
         Util.verificaCodAcesso(codigoAcesso, entity.getCodigoAcesso());
         this.entregadorRepository.deleteById(id);
     }

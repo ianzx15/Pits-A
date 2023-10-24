@@ -2,30 +2,29 @@ package com.ufcg.psoft.commerce.service.pedido;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.ufcg.psoft.commerce.model.Estabelecimento;
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
+import com.ufcg.psoft.commerce.dto.pedido.PedidoEntregadorResponseDTO;
+import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoCodAcessoException;
+import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoProntoException;
+import com.ufcg.psoft.commerce.exception.pedido.SemEntregadoresDispException;
+import com.ufcg.psoft.commerce.model.*;
+import com.ufcg.psoft.commerce.observer.NotificaEntregaPedido;
+import com.ufcg.psoft.commerce.observer.NotificaPedidoEmRota;
+import com.ufcg.psoft.commerce.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
 import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.pedido.MetodoDePagamentoIndisponivel;
-import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPertenceAEntidade;
-import com.ufcg.psoft.commerce.model.Cliente;
-import com.ufcg.psoft.commerce.model.Pedido;
-import com.ufcg.psoft.commerce.model.Pizza;
-import com.ufcg.psoft.commerce.repository.ClienteRepository;
-import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
-import com.ufcg.psoft.commerce.repository.PedidoRepository;
-import com.ufcg.psoft.commerce.repository.PizzaRepository;
+import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPodeSerCancelado;
 
 @Service
-public class PedidoServiceImpl implements PedidoService {
+public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, NotificaPedidoEmRota {
 
     @Autowired
     ModelMapper modelMapper;
@@ -40,13 +39,16 @@ public class PedidoServiceImpl implements PedidoService {
     PizzaRepository pizzaRepository;
 
     @Autowired
+    EntregadorRepository entregadorRepository;
+
+    @Autowired
     EstabelecimentoRepository estabelecimentoRepository;
 
     @Override
     public PedidoResponseDTO criar(Long clienteId, String clienteCodigoAcesso, Long estabelecimentoId,
             PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
 
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = RetornaEntidades.retornaCliente(clienteId, this.clienteRepository);
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
         estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
 
@@ -71,8 +73,8 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public PedidoResponseDTO atualizar(Long pedidoId, String clienteCodigoAcesso,
             PedidoPostPutRequestDTO pedidoPostPutRequestDTO) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
-        Cliente cliente = clienteRepository.findById(pedido.getClienteId()).get();
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
+        Cliente cliente = RetornaEntidades.retornaCliente(pedido.getClienteId(), this.clienteRepository);
 
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
 
@@ -94,7 +96,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public List<Pedido> recuperaTodosPedidosCliente(Long clienteId, String codigoAcesso) {
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = RetornaEntidades.retornaCliente(clienteId, this.clienteRepository);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
 
         return pedidoRepository.findByClienteId(clienteId);
@@ -102,11 +104,11 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public Pedido recuperaPedidoPorIdCliente(Long pedidoId, Long clienteId, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
         if (!pedido.getClienteId().equals(clienteId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
         }
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = RetornaEntidades.retornaCliente(clienteId, this.clienteRepository);
 
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
 
@@ -115,8 +117,7 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public List<Pedido> recuperaTodosPedidosEstabelecimento(Long estabelecimentoId, String codigoAcesso) {
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-                .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, this.estabelecimentoRepository);
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
         return pedidoRepository.findByEstabelecimentoId(estabelecimentoId);
@@ -124,12 +125,11 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public Pedido recuperaPedidoPorIdEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
         if (!pedido.getEstabelecimentoId().equals(estabelecimentoId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
         }
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-                .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, this.estabelecimentoRepository);
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
         return pedido;
@@ -142,13 +142,18 @@ public class PedidoServiceImpl implements PedidoService {
         clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
         if (pedidoId == null) {
             List<Pedido> pedidos = pedidoRepository.findByClienteIdAndEstabelecimentoId(clienteId, estabelecimentoId);
-            return pedidos.stream()
-                    .map(pedido -> modelMapper
-                            .map(pedido, PedidoResponseDTO.class))
+            return pedidos.stream().sorted((p1, p2) -> {
+                if (!p1.getStatusEntrega().equals("Pedido entregue")) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }).map(p -> modelMapper
+                    .map(p, PedidoResponseDTO.class))
                     .collect(Collectors.toList());
         }
 
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
 
         if (!pedido.getClienteId().equals(clienteId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
@@ -156,7 +161,7 @@ public class PedidoServiceImpl implements PedidoService {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
         }
 
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = RetornaEntidades.retornaCliente(clienteId, this.clienteRepository);
 
         Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
 
@@ -165,24 +170,37 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public void deletePorCliente(Long pedidoId, Long clienteId, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
         if (!pedido.getClienteId().equals(clienteId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao cliente!");
         }
-        Cliente cliente = clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = RetornaEntidades.retornaCliente(clienteId, this.clienteRepository);
         Util.verificaCodAcesso(codigoAcesso, cliente.getCodigoAcesso());
 
         pedidoRepository.deleteById(pedidoId);
     }
 
     @Override
+    public List<PedidoResponseDTO> recuperaHistoricoFiltradoPorEntrega(Long clientId, Long estabelecientoId,
+            String codigoAcessoCliente, String statusEntrega) {
+        Cliente cliente = RetornaEntidades.retornaCliente(clientId, this.clienteRepository);
+        Util.verificaCodAcesso(codigoAcessoCliente, cliente.getCodigoAcesso());
+        List<Pedido> pedidos = pedidoRepository.findByClienteIdAndEstabelecimentoIdAndStatusEntrega(clientId,
+                estabelecientoId, statusEntrega);
+
+        return pedidos.stream().map(p -> modelMapper
+                .map(p, PedidoResponseDTO.class))
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
     public void deletePorEstabelecimento(Long pedidoId, Long estabelecimentoId, String codigoAcesso) {
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
         if (!pedido.getEstabelecimentoId().equals(estabelecimentoId)) {
             throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
         }
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-                .orElseThrow(() -> new EstabelecimentoNaoEncontrado());
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, this.estabelecimentoRepository);
         Util.verificaCodAcesso(codigoAcesso, estabelecimento.getCodigoAcesso());
 
         this.pedidoRepository.deleteById(pedidoId);
@@ -191,17 +209,13 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public void deleteTodosPedidosEstabelecimento(Long estabelecimentoId) {
         estabelecimentoRepository.findById(estabelecimentoId).orElseThrow(() -> new EstabelecimentoNaoEncontrado());
-
         pedidoRepository.deleteByEstabelecimentoId(estabelecimentoId);
-        ;
     }
 
     @Override
     public void deleteTodosPedidosCliente(Long clienteId) {
         clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNotFoundException());
-
         pedidoRepository.deleteByClienteId(clienteId);
-        ;
     }
 
     private Double calculaPrecoPedido(List<Pizza> pizzas) {
@@ -233,9 +247,9 @@ public class PedidoServiceImpl implements PedidoService {
         if (!metodosDisponiveis.contains(metodoPagamento)) {
             throw new MetodoDePagamentoIndisponivel();
         }
-        Cliente cliente = clienteRepository.findById(clientId).orElseThrow(() -> new ClienteNotFoundException());
+        Cliente cliente = RetornaEntidades.retornaCliente(clientId, this.clienteRepository);
         Util.verificaCodAcesso(codigoAcessoCliente, cliente.getCodigoAcesso());
-        Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new PedidoNaoEncontrado());
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
 
         pedido.setStatusPagamento(true);
         if (metodoPagamento.equals("PIX")) {
@@ -243,9 +257,90 @@ public class PedidoServiceImpl implements PedidoService {
         } else if (metodoPagamento.equals("DEBITO")) {
             pedido.setPreco(pedido.getPreco() * 0.975);
         }
+
+        pedido.setStatusEntrega("Pedido em preparo");
         pedidoRepository.flush();
 
         return modelMapper.map(pedido, PedidoResponseDTO.class);
+    }
+
+    @Override
+    public PedidoResponseDTO confirmarEntrega(Long pedidoId, Long clienteId, String clienteCodigoAcesso) {
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, this.pedidoRepository);
+        Cliente cliente = RetornaEntidades.retornaCliente(clienteId, this.clienteRepository);
+        Util.verificaCodAcesso(clienteCodigoAcesso, cliente.getCodigoAcesso());
+
+        pedido.setStatusEntrega("Pedido entregue");
+        RetornaEntidades.retornaEstabelecimento(pedido.getEstabelecimentoId(), this.estabelecimentoRepository);
+        this.pedidoRepository.flush();
+        notificaEntrega(pedido.getEstabelecimentoId(), pedidoId);
+
+        return modelMapper.map(pedido, PedidoResponseDTO.class);
+    }
+
+    @Override
+    public PedidoResponseDTO preparaPedido(Long pedidoId) {
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
+        pedido.setStatusEntrega("Pedido pronto");
+        this.pedidoRepository.flush();
+
+        return modelMapper.map(pedido, PedidoResponseDTO.class);
+    }
+
+    @Override
+    public PedidoEntregadorResponseDTO atribuiEntregador(Long pedidoId, String estabelecimentoCodigoAcesso, Long estabelecimentoId) {
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, estabelecimentoRepository);
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
+
+        if (!estabelecimentoCodigoAcesso.equals(estabelecimento.getCodigoAcesso())) {
+            throw new EstabelecimentoCodAcessoException();
+        }
+
+        if (!pedido.getStatusEntrega().equals("Pedido pronto")) {
+            throw new PedidoNaoProntoException();
+        }
+
+        if (estabelecimento.getEntregadoresDisponiveis().isEmpty()) {
+            throw new SemEntregadoresDispException();
+        }
+
+        Entregador entregador = estabelecimento.getEntregadoresDisponiveis().get(0);
+
+        entregador.setStatusAprovacao(true);
+        pedido.setEntregadorId(entregador.getId());
+        pedido.setStatusEntrega("Pedido em rota");
+        notificaEmRota(pedidoId, estabelecimentoId, entregador);
+
+        this.entregadorRepository.flush();
+        this.pedidoRepository.flush();
+
+        return modelMapper.map(pedido, PedidoEntregadorResponseDTO.class);
+    }
+
+    @Override
+    public void notificaEntrega(Long estabelecimentoId, Long pedidoId) {
+
+        System.out.println("Olá estabelecimento " + estabelecimentoId + ", o pedido " + pedidoId + " mudou de status para Pedido entregue!");
+    }
+
+    @Override
+    public void notificaEmRota(Long pedidoId, Long clientId, Entregador entregador) {
+        System.out.println("Olá Cliente, " + clientId +  " o seu pedido " + pedidoId + " está em rota, o entregador responsável é: " + entregador.toString());
+    }
+
+    @Override
+    public void cancelarPedido(Long pedidoId, String clienteCodigoAcesso) {
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
+        Cliente cliente = RetornaEntidades.retornaCliente(pedido.getClienteId(), clienteRepository);
+
+        Util.verificaCodAcesso(cliente.getCodigoAcesso(), clienteCodigoAcesso);
+
+        if (pedido.getStatusEntrega().equals("Pedido recebido") || pedido.getStatusEntrega().equals("Pedido em preparo")) {
+            pedidoRepository.deleteById(pedidoId);
+        } else {
+            throw new PedidoNaoPodeSerCancelado();
+        }
+
     }
 
 }

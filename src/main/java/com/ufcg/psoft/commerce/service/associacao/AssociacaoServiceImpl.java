@@ -1,12 +1,11 @@
 package com.ufcg.psoft.commerce.service.associacao;
 
 
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ufcg.psoft.commerce.Util.Util;
-import com.ufcg.psoft.commerce.exception.entregador.EntregadorNotFoundException;
-import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.model.Associacao;
 import com.ufcg.psoft.commerce.model.Entregador;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
@@ -28,37 +27,33 @@ public class AssociacaoServiceImpl implements AssociacaoService {
 
     @Override
     public Associacao criar(Long entregadorId, String entregadorCodigoAcesso, Long estabelecimentoId) {
-        Entregador entregador = entregadorRepository.findById(entregadorId)
-            .orElseThrow(EntregadorNotFoundException::new);
+        Entregador entregador = RetornaEntidades.retornaEntregador(entregadorId, entregadorRepository);
 
         Util.verificaCodAcesso(entregadorCodigoAcesso, entregador.getCodigoAcesso());
 
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-            .orElseThrow(EstabelecimentoNaoEncontrado::new);
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, estabelecimentoRepository);
 
         return associacaoRepository.save(Associacao.builder()
             .estabelecimento(estabelecimento)
             .entregador(entregador)
             .build());
-
     }
 
     @Override
     public Associacao atualizar(Long entregadorId, String estabelecimentoCodigoAcesso, Long estabelecimentoId) {
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-            .orElseThrow(EstabelecimentoNaoEncontrado::new);
-            
-        entregadorRepository.findById(entregadorId)
-            .orElseThrow(EntregadorNotFoundException::new);
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, estabelecimentoRepository);
+        Entregador entregador = RetornaEntidades.retornaEntregador(entregadorId, entregadorRepository);
+
         Util.verificaCodAcesso(estabelecimentoCodigoAcesso, estabelecimento.getCodigoAcesso());
-        
+
         Associacao associacao = associacaoRepository.findByEstabelecimentoIdAndEntregadorId(estabelecimentoId, entregadorId);
 
-
         associacao.setStatus(true);
+        estabelecimento.getEntregadoresDisponiveis().add(entregador);
 
         associacaoRepository.flush();
+        estabelecimentoRepository.flush();
+
         return associacao;
     }
-    
 }

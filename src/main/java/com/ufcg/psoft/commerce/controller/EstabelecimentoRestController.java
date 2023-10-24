@@ -88,4 +88,5 @@ public class EstabelecimentoRestController {
                 estabelecimentoServices.getCardapioPorTipo(id, tipo)
         );
     }
+
 }

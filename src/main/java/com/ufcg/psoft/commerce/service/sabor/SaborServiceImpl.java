@@ -3,8 +3,9 @@ package com.ufcg.psoft.commerce.service.sabor;
 import java.util.List;
 import java.util.Set;
 
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.model.Cliente;
-import com.ufcg.psoft.commerce.service.cliente.Notification;
+import com.ufcg.psoft.commerce.observer.NotificaDispSabor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class SaborServiceImpl implements SaborService {
   @Autowired
   private ModelMapper modelMapper;
   @Autowired
-  private Notification notification;
+  private NotificaDispSabor notificaDispSabor;
 
   @Override
   public SaborResponseDTO recuperar(Long estabelecimendoId, String codigoDeAcceso, Long saborId) {
@@ -64,7 +65,7 @@ public class SaborServiceImpl implements SaborService {
   public SaborResponseDTO atualizar(Long estabelecimendoId, String codigoDeAcceso, Long saborId,
       SaborPostPutRequestDTO saborPostPutRequestDTO) {
     estabelecimentoService.getEstabelecimento(codigoDeAcceso, estabelecimendoId);
-    saborRepository.findById(saborId).orElseThrow(() -> new SaborNaoEncontrado());
+    RetornaEntidades.retornaSabor(saborId, saborRepository);
 
     Sabor sabor = modelMapper.map(saborPostPutRequestDTO, Sabor.class);
     sabor.setId(saborId);
@@ -75,7 +76,7 @@ public class SaborServiceImpl implements SaborService {
   @Override
   public void deletar(Long estabelecimendoId, String codigoDeAcceso, Long saborId) {
     estabelecimentoService.getEstabelecimento(codigoDeAcceso, estabelecimendoId);
-    saborRepository.findById(saborId).orElseThrow(() -> new SaborNaoEncontrado());
+    RetornaEntidades.retornaSabor(saborId, saborRepository);
 
     saborRepository.deleteById(saborId);
   }
@@ -85,7 +86,7 @@ public class SaborServiceImpl implements SaborService {
       SaborDisponibilidadePatchDTO disponibilidadePatchDTO) {
     estabelecimentoService.getEstabelecimento(codigoDeAcceso, estabelecimendoId);
 
-    Sabor sabor = saborRepository.findById(saborId).orElseThrow(() -> new SaborNaoEncontrado());
+    Sabor sabor = RetornaEntidades.retornaSabor(saborId, saborRepository);
     sabor.setDisponivel(disponibilidadePatchDTO.getDisponivel());
 
     if (disponibilidadePatchDTO.getDisponivel()) {
@@ -97,8 +98,9 @@ public class SaborServiceImpl implements SaborService {
 
   private void notificaDisponibilidade(Sabor sabor) {
     Set<Cliente> clientesInteressados = sabor.getClientesInteressados();
-    if (clientesInteressados.size() > 0) {
-      clientesInteressados.forEach(cliente -> this.notification.notificate(sabor.getNome(),cliente.getNome()));
+
+    if (!clientesInteressados.isEmpty()) {
+      clientesInteressados.forEach(cliente -> this.notificaDispSabor.notificaDispSabor(sabor.getNome(),cliente.getNome()));
     }
   }
 
