@@ -155,9 +155,16 @@ public class PedidoRestController {
 
   @PutMapping("/{pedidoId}/associar-pedido-entregador")
   ResponseEntity<PedidoEntregadorResponseDTO> associarEntregadorPedido(
-          @PathVariable Long pedidoId,
-          @RequestParam String estabelecimentoCodigoAcesso,
-          @RequestParam Long estabelecimentoId) {
+        @PathVariable Long pedidoId,
+        @RequestParam String estabelecimentoCodigoAcesso,
+        @RequestParam Long estabelecimentoId) {
     return ResponseEntity.ok(pedidoService.atribuiEntregador(pedidoId, estabelecimentoCodigoAcesso, estabelecimentoId));
+  }
+
+  @DeleteMapping("/{pedidoId}/cancelar-pedido")
+  ResponseEntity<?> cancelarPedido(@PathVariable Long pedidoId, @RequestParam String clienteCodigoAcesso) {
+    pedidoService.cancelarPedido(pedidoId, clienteCodigoAcesso);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .build();
   }
 }

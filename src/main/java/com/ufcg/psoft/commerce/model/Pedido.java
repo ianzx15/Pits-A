@@ -67,6 +67,7 @@ public class Pedido {
 
     @Column(name = "status_entrega")
     @JsonProperty("statusEntrega")
+    @Builder.Default
     private String statusEntrega = "Pedido recebido";
 
 }

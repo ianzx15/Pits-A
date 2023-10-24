@@ -21,6 +21,7 @@ import com.ufcg.psoft.commerce.exception.cliente.ClienteNotFoundException;
 import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoNaoEncontrado;
 import com.ufcg.psoft.commerce.exception.pedido.MetodoDePagamentoIndisponivel;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPertenceAEntidade;
+import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPodeSerCancelado;
 
 @Service
 public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, NotificaPedidoEmRota {
@@ -325,6 +326,21 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
     @Override
     public void notificaEmRota(Long pedidoId, Long clientId, Entregador entregador) {
         System.out.println("Olá Cliente, " + clientId +  " o seu pedido " + pedidoId + " está em rota, o entregador responsável é: " + entregador.toString());
+    }
+
+    @Override
+    public void cancelarPedido(Long pedidoId, String clienteCodigoAcesso) {
+        Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
+        Cliente cliente = RetornaEntidades.retornaCliente(pedido.getClienteId(), clienteRepository);
+
+        Util.verificaCodAcesso(cliente.getCodigoAcesso(), clienteCodigoAcesso);
+
+        if (pedido.getStatusEntrega().equals("Pedido recebido") || pedido.getStatusEntrega().equals("Pedido em preparo")) {
+            pedidoRepository.deleteById(pedidoId);
+        } else {
+            throw new PedidoNaoPodeSerCancelado();
+        }
+
     }
 
 }
