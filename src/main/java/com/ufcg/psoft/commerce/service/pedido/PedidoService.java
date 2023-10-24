@@ -44,4 +44,5 @@ public interface PedidoService {
 
   public PedidoEntregadorResponseDTO atribuiEntregador(Long pedidoId, String estabelecimentoCodigoAcesso, Long estabelecimentoId);
 
+  public void cancelarPedido(Long pedidoId, String clienteCodigoAcesso);
 }

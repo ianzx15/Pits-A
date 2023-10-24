@@ -705,24 +705,52 @@ public class PedidoControllerTests {
       assertEquals(pedido.getEstabelecimentoId(), resultado.get(0).getEstabelecimentoId());
     }
 
-    // @Test
-    // @DisplayName("Quando um cliente cancela um pedido")
-    // void quandoClienteCancelaPedido() throws Exception {
-    //   // Arrange
-    //   pedidoRepository.save(pedido);
+    @Test
+    @DisplayName("Quando um cliente cancela um pedido")
+    void quandoClienteCancelaPedido() throws Exception {
+      // Arrange
+      pedidoRepository.save(pedido);
 
-    //   // Act
-    //   String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" +
-    //       pedido.getId() + "/cancelar-pedido")
-    //       .contentType(MediaType.APPLICATION_JSON)
-    //       .param("clienteCodigoAcesso", cliente.getCodigoAcesso()))
-    //       .andExpect(status().isNoContent())
-    //       .andDo(print())
-    //       .andReturn().getResponse().getContentAsString();
+      // Act
+      String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" +
+          pedido.getId() + "/cancelar-pedido")
+          .contentType(MediaType.APPLICATION_JSON)
+          .param("clienteCodigoAcesso", cliente.getCodigoAcesso()))
+          .andExpect(status().isNoContent())
+          .andDo(print())
+          .andReturn().getResponse().getContentAsString();
 
-    //   // Assert
-    //   assertTrue(responseJsonString.isBlank());
-    // }
+      // Assert
+      assertTrue(responseJsonString.isBlank());
+    }
+
+    @Test
+    @DisplayName("Quando um cliente cancela um pedido incancelavel")
+    void quandoUmClienteCancelaUmPedidoIncancelavel() throws Exception {
+        // Arrange
+        Pedido pedidoTest = pedidoRepository.save(Pedido.builder()
+          .preco(30.0)
+          .enderecoEntrega("Casa 237")
+          .clienteId(cliente.getId())
+          .estabelecimentoId(estabelecimento.getId())
+          .pizzas(List.of(pizzaM))
+          .statusEntrega("Pedido entregue")
+          .build());
+
+        // Act
+        String responseJsonString = driver.perform(delete(URI_PEDIDOS + "/" +
+          pedidoTest.getId() + "/cancelar-pedido")
+          .contentType(MediaType.APPLICATION_JSON)
+          .param("clienteCodigoAcesso", cliente.getCodigoAcesso()))
+          .andExpect(status().isBadRequest())
+          .andDo(print())
+          .andReturn().getResponse().getContentAsString();
+          
+          CustomErrorType resultado = objectMapper.readValue(responseJsonString, CustomErrorType.class);
+
+        // Assert
+        assertEquals("Pedido nao pode ser cancelado!", resultado.getMessage());
+    }
 
     @Test
     @DisplayName("Quando um cliente busca todos os pedidos feitos naquele estabelcimento com status")
@@ -785,7 +813,7 @@ public class PedidoControllerTests {
           .pizzas(List.of(pizzaM))
           .statusEntrega("Pedido em preparo")
           .build());
-      Pedido pedido4 = pedidoRepository.save(Pedido.builder()
+        pedidoRepository.save(Pedido.builder()
           .preco(50.0)
           .enderecoEntrega("Casa 237")
           .clienteId(cliente.getId())
