@@ -12,4 +12,5 @@ public interface EntregadorServicesInterface {
     public EntregadorGetRequestDTO getById(Long id);
     public Entregador update(Long id, String codigoAcesso, EntregadorPostPutRequestDTO data);
     public void delete(Long id, String codigoAcesso);
+    public Entregador atualizaDisponibilidade(Long id, Boolean disponibilidade, String codigoAcesso);
 }

@@ -68,4 +68,13 @@ public class EntregadorServices implements EntregadorServicesInterface {
         Util.verificaCodAcesso(codigoAcesso, entity.getCodigoAcesso());
         this.entregadorRepository.deleteById(id);
     }
+
+    @Override
+    public Entregador atualizaDisponibilidade(Long id, Boolean disponibilidade, String codigoAcesso){
+        Entregador entregador = RetornaEntidades.retornaEntregador(id, this.entregadorRepository);
+        Util.verificaCodAcesso(codigoAcesso, entregador.getCodigoAcesso());
+        entregador.setDisponibilidade(disponibilidade);
+        return entregador;
+    }
+
 }
