@@ -339,7 +339,7 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
 
     @Override
     public void notificaEntregador(Long pedidoId, Long entregadorId) {
-        System.out.println("Olá entregador" + entregadorId + ", o pedido " + pedidoId + " está disponível para entrega!");
+        System.out.println("Olá entregador " + entregadorId + ", o pedido " + pedidoId + " está disponível para entrega!");
     }
 
     @Override

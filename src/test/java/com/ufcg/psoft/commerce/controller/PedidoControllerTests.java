@@ -870,7 +870,7 @@ public class PedidoControllerTests {
       // Arrange
       pedidoRepository.save(pedido);
       pedido.setStatusEntrega("Pedido pronto");
-      List<Entregador> entregadores = new LinkedList<>();
+      LinkedList<Entregador> entregadores = new LinkedList<>();
       entregadores.add(entregador);
       estabelecimento.setEntregadoresDisponiveis(entregadores);
       entregador.setDisponibilidade(true);
@@ -918,7 +918,10 @@ public class PedidoControllerTests {
           .trim().contains("Olá estabelecimento " + resultado.getEstabelecimentoId() + ", o pedido " + resultado.getId()
               + " mudou de status para Pedido entregue!"));
     }
-  }
+
+
+
+}
 
   @Nested
   @DisplayName("Conjunto de casos de teste da confirmação de pagamento de um pedido")
@@ -929,12 +932,12 @@ public class PedidoControllerTests {
     @BeforeEach
     void setUp() {
       pedido1 = pedidoRepository.save(Pedido.builder()
-          .estabelecimentoId(estabelecimento.getId())
-          .clienteId(cliente.getId())
-          .enderecoEntrega("Rua 1")
-          .pizzas(List.of(pizzaG))
-          .preco(10.0)
-          .build());
+              .estabelecimentoId(estabelecimento.getId())
+              .clienteId(cliente.getId())
+              .enderecoEntrega("Rua 1")
+              .pizzas(List.of(pizzaG))
+              .preco(10.0)
+              .build());
     }
 
     @Test
@@ -943,17 +946,17 @@ public class PedidoControllerTests {
       // Arrange
       // Act
       String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + cliente.getId() + "/confirmar-pagamento")
-          .contentType(MediaType.APPLICATION_JSON)
-          .param("codigoAcessoCliente", cliente.getCodigoAcesso())
-          .param("pedidoId", pedido1.getId().toString())
-          .param("metodoPagamento", "CREDITO"))
-          .andExpect(status().isOk()) // Codigo 200
-          .andReturn().getResponse().getContentAsString();
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .param("codigoAcessoCliente", cliente.getCodigoAcesso())
+                      .param("pedidoId", pedido1.getId().toString())
+                      .param("metodoPagamento", "CREDITO"))
+              .andExpect(status().isOk()) // Codigo 200
+              .andReturn().getResponse().getContentAsString();
       // Assert
       PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, PedidoResponseDTO.class);
       assertAll(
-          () -> assertTrue(resultado.getStatusPagamento()),
-          () -> assertEquals(10, resultado.getPreco()));
+              () -> assertTrue(resultado.getStatusPagamento()),
+              () -> assertEquals(10, resultado.getPreco()));
     }
 
     @Test
@@ -962,17 +965,17 @@ public class PedidoControllerTests {
       // Arrange
       // Act
       String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + cliente.getId() + "/confirmar-pagamento")
-          .contentType(MediaType.APPLICATION_JSON)
-          .param("codigoAcessoCliente", cliente.getCodigoAcesso())
-          .param("pedidoId", pedido1.getId().toString())
-          .param("metodoPagamento", "DEBITO"))
-          .andExpect(status().isOk()) // Codigo 200
-          .andReturn().getResponse().getContentAsString();
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .param("codigoAcessoCliente", cliente.getCodigoAcesso())
+                      .param("pedidoId", pedido1.getId().toString())
+                      .param("metodoPagamento", "DEBITO"))
+              .andExpect(status().isOk()) // Codigo 200
+              .andReturn().getResponse().getContentAsString();
       // Assert
       PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, PedidoResponseDTO.class);
       assertAll(
-          () -> assertTrue(resultado.getStatusPagamento()),
-          () -> assertEquals(9.75, resultado.getPreco()));
+              () -> assertTrue(resultado.getStatusPagamento()),
+              () -> assertEquals(9.75, resultado.getPreco()));
     }
 
     @Test
@@ -981,17 +984,17 @@ public class PedidoControllerTests {
       // Arrange
       // Act
       String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + cliente.getId() + "/confirmar-pagamento")
-          .contentType(MediaType.APPLICATION_JSON)
-          .param("codigoAcessoCliente", cliente.getCodigoAcesso())
-          .param("pedidoId", pedido1.getId().toString())
-          .param("metodoPagamento", "PIX"))
-          .andExpect(status().isOk()) // Codigo 200
-          .andReturn().getResponse().getContentAsString();
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .param("codigoAcessoCliente", cliente.getCodigoAcesso())
+                      .param("pedidoId", pedido1.getId().toString())
+                      .param("metodoPagamento", "PIX"))
+              .andExpect(status().isOk()) // Codigo 200
+              .andReturn().getResponse().getContentAsString();
       // Assert
       PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, PedidoResponseDTO.class);
       assertAll(
-          () -> assertTrue(resultado.getStatusPagamento()),
-          () -> assertEquals(9.5, resultado.getPreco()));
+              () -> assertTrue(resultado.getStatusPagamento()),
+              () -> assertEquals(9.5, resultado.getPreco()));
     }
 
     @Test
@@ -999,31 +1002,129 @@ public class PedidoControllerTests {
     void mudaStatusParaPedidoEmPreparo() throws Exception {
 
       String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + cliente.getId() + "/confirmar-pagamento")
-          .contentType(MediaType.APPLICATION_JSON)
-          .param("codigoAcessoCliente", cliente.getCodigoAcesso())
-          .param("pedidoId", pedido1.getId().toString())
-          .param("metodoPagamento", "PIX"))
-          .andExpect(status().isOk()) // Codigo 200
-          .andReturn().getResponse().getContentAsString();
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .param("codigoAcessoCliente", cliente.getCodigoAcesso())
+                      .param("pedidoId", pedido1.getId().toString())
+                      .param("metodoPagamento", "PIX"))
+              .andExpect(status().isOk()) // Codigo 200
+              .andReturn().getResponse().getContentAsString();
       // Assert
       PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, PedidoResponseDTO.class);
       assertEquals("Pedido em preparo", resultado.getStatusEntrega());
     }
 
     @Test
-    @DisplayName("Quando pedido status muda de Pedido em preparo para Pedido pronto")
-    void mudaStatusParaPedidoPronto() throws Exception {
+    @DisplayName("Quando pedido status muda de Pedido em preparo para Pedido pronto e existe entregador disponivel")
+    void mudaStatusParaPedidoProntoEntregadorDisponivel() throws Exception {
 
-      pedido1.setStatusEntrega("Pedido em preparo");
+      Estabelecimento estabelecimento = estabelecimentoRepository.save(Estabelecimento.builder()
+              .codigoAcesso("654321")
+              .build());
 
-      String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido1.getId() + "/status-pedido/pronto")
-          .contentType(MediaType.APPLICATION_JSON))
-          .andExpect(status().isOk()) // Codigo 200
-          .andReturn().getResponse().getContentAsString();
+      Sabor sabor1 = saborRepository.save(Sabor.builder()
+              .nome("Sabor Um")
+              .tipo("salgado")
+              .precoM(10.0)
+              .precoG(20.0)
+              .disponivel(true)
+              .build());
+
+      Cliente cliente = clienteRepository.save(Cliente.builder()
+              .nome("Anton Ego")
+              .endereco("Paris")
+              .codigoAcesso("123456")
+              .build());
+      Entregador entregador = entregadorRepository.save(Entregador.builder()
+              .nome("Joãozinho")
+              .placaVeiculo("ABC-1234")
+              .corVeiculo("Azul")
+              .tipoVeiculo("Moto")
+              .codigoAcesso("101010")
+              .build());
+      estabelecimento.getEntregadoresDisponiveis().add(entregador);
+      Pizza pizzaM = Pizza.builder()
+              .sabor1(sabor1)
+              .tamanho("media")
+              .build();
+
+      List<Pizza> pizzas = List.of(pizzaM);
+      Pedido pedido = Pedido.builder()
+              .preco(10.0)
+              .enderecoEntrega("Casa 237")
+              .clienteId(cliente.getId())
+              .estabelecimentoId(estabelecimento.getId())
+              .entregadorId(0L)
+              .pizzas(pizzas)
+              .build();
+      pedidoRepository.save(pedido);
+
+      String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/status-pedido/pronto")
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk()) // Codigo 200
+              .andReturn().getResponse().getContentAsString();
       // Assert
       PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, PedidoResponseDTO.class);
-      assertEquals("Pedido pronto", resultado.getStatusEntrega());
+      assertAll(
+              () -> assertEquals("Pedido em rota", resultado.getStatusEntrega()),
+              () -> assertTrue(outputStreamCaptor.toString()
+                      .trim().contains("Olá entregador " + entregador.getId() + ", o pedido " + pedido.getId() + " está disponível para entrega!"))
+      );
+    }
+
+    @Test
+    @DisplayName("Quando pedido status muda de Pedido em preparo para Pedido pronto e entregador indisponivel")
+    void mudaStatusParaPedidoProntoEntregadorIndisponivel() throws Exception {
+
+      Estabelecimento estabelecimento = estabelecimentoRepository.save(Estabelecimento.builder()
+              .codigoAcesso("654321")
+              .build());
+
+      Sabor sabor1 = saborRepository.save(Sabor.builder()
+              .nome("Sabor Um")
+              .tipo("salgado")
+              .precoM(10.0)
+              .precoG(20.0)
+              .disponivel(true)
+              .build());
+
+      Cliente cliente = clienteRepository.save(Cliente.builder()
+              .nome("Anton Ego")
+              .endereco("Paris")
+              .codigoAcesso("123456")
+              .build());
+      Entregador entregador = entregadorRepository.save(Entregador.builder()
+              .nome("Joãozinho")
+              .placaVeiculo("ABC-1234")
+              .corVeiculo("Azul")
+              .tipoVeiculo("Moto")
+              .codigoAcesso("101010")
+              .build());
+      Pizza pizzaM = Pizza.builder()
+              .sabor1(sabor1)
+              .tamanho("media")
+              .build();
+      List<Pizza> pizzas = List.of(pizzaM);
+      Pedido pedido = Pedido.builder()
+              .preco(10.0)
+              .enderecoEntrega("Casa 237")
+              .clienteId(cliente.getId())
+              .estabelecimentoId(estabelecimento.getId())
+              .entregadorId(0L)
+              .pizzas(pizzas)
+              .build();
+      pedidoRepository.save(pedido);
+
+      String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/status-pedido/pronto")
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk()) // Codigo 200
+              .andReturn().getResponse().getContentAsString();
+      // Assert
+      PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString, PedidoResponseDTO.class);
+      assertAll(
+              () -> assertEquals("Pedido pronto", resultado.getStatusEntrega()),
+              () -> assertTrue(pedido.getEntregadorId() == 0)
+      );
+
     }
   }
-
 }
