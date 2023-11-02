@@ -41,7 +41,8 @@ public class Pedido {
 
     @JsonProperty("entregador_id")
     @Column(name = "entregador_id")
-    private Long entregadorId;
+    @Builder.Default
+    private Long entregadorId = 0L;
 
     @JsonProperty("endereco_entrega")
     @Column(name = "endereco_entrega")

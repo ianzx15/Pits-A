@@ -870,7 +870,6 @@ public class PedidoControllerTests {
       // Arrange
       pedidoRepository.save(pedido);
       pedido.setStatusEntrega("Pedido pronto");
-      entregador.setStatusAprovacao(true);
       List<Entregador> entregadores = new LinkedList<>();
       entregadores.add(entregador);
       estabelecimento.setEntregadoresDisponiveis(entregadores);

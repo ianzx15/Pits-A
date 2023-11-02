@@ -50,18 +50,14 @@ public class Entregador {
     @Column(nullable = false, name = "ent_codigoAcesso")
     private String codigoAcesso;
 
-    @JsonProperty("statusAprovacao")
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean statusAprovacao;
-
     @JsonProperty("disponilibidade")
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean disponibilidade;
+    @Column(nullable = false, name = "ent_disponibilidade")
+    @Builder.Default
+    private boolean disponibilidade = false;
 
     @OneToMany(mappedBy = "entregador", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Associacao> associacoes;
-
 
     public String toString() {
         return (
