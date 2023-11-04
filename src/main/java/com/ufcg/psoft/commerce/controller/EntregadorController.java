@@ -53,8 +53,10 @@ public class EntregadorController {
     @PutMapping(value = "/{id}/disponibilidade")
     @Transactional
     public ResponseEntity<?> atualizaDisponibilidade(@PathVariable Long id,
-                                                     @RequestParam Boolean disponibilidade,
-                                                     @RequestParam String codigoAcesso){
-        return ResponseEntity.ok(this.entregadorServices.atualizaDisponibilidade(id, disponibilidade, codigoAcesso));
+            @RequestParam Long estabelecimentoId,
+            @RequestParam Boolean disponibilidade,
+            @RequestParam String codigoAcesso) {
+        this.entregadorServices.atualizarDisponibilidade(id, estabelecimentoId, codigoAcesso, disponibilidade);
+        return ResponseEntity.ok().build();
     }
 }
