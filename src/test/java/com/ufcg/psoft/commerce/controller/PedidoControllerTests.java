@@ -873,7 +873,6 @@ public class PedidoControllerTests {
       LinkedList<Entregador> entregadores = new LinkedList<>();
       entregadores.add(entregador);
       estabelecimento.setEntregadoresDisponiveis(entregadores);
-      entregador.setDisponibilidade(true);
 
       // Act
       String responseJsonString = driver.perform(put(URI_PEDIDOS + "/" + pedido.getId() + "/associar-pedido-entregador")
