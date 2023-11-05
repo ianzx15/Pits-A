@@ -4,9 +4,18 @@ import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.Util.Util;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorGetRequestDTO;
 import com.ufcg.psoft.commerce.dto.entregador.EntregadorPostPutRequestDTO;
+import com.ufcg.psoft.commerce.exception.associacao.AssociacaoNotFoundException;
 import com.ufcg.psoft.commerce.exception.entregador.EntregadorNotFoundException;
+import com.ufcg.psoft.commerce.model.Associacao;
 import com.ufcg.psoft.commerce.model.Entregador;
+import com.ufcg.psoft.commerce.model.Estabelecimento;
+import com.ufcg.psoft.commerce.model.Pedido;
+import com.ufcg.psoft.commerce.repository.AssociacaoRepository;
 import com.ufcg.psoft.commerce.repository.EntregadorRepository;
+import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
+import com.ufcg.psoft.commerce.repository.PedidoRepository;
+import com.ufcg.psoft.commerce.service.pedido.PedidoServiceImpl;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +29,16 @@ public class EntregadorServices implements EntregadorServicesInterface {
 
     @Autowired
     private EntregadorRepository entregadorRepository;
+
+    @Autowired
+    private AssociacaoRepository associacaoRepository;
+
+    @Autowired
+    private EstabelecimentoRepository estabelecimentoRepository;
+
+    @Autowired
+    private PedidoServiceImpl pedidoService;
+
 
     @Autowired
     private ModelMapper modelMapper;
@@ -70,11 +89,32 @@ public class EntregadorServices implements EntregadorServicesInterface {
     }
 
     @Override
-    public Entregador atualizaDisponibilidade(Long id, Boolean disponibilidade, String codigoAcesso){
-        Entregador entregador = RetornaEntidades.retornaEntregador(id, this.entregadorRepository);
-        Util.verificaCodAcesso(codigoAcesso, entregador.getCodigoAcesso());
-        entregador.setDisponibilidade(disponibilidade);
-        return entregador;
-    }
+    public void atualizarDisponibilidade(Long entregadorId, Long estabelecimentoId, String entregadorCodigoDeAcesso,
+            Boolean disponibilidade) {
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId,
+                estabelecimentoRepository);
+        Entregador entregador = RetornaEntidades.retornaEntregador(entregadorId, entregadorRepository);
+        Util.verificaCodAcesso(entregadorCodigoDeAcesso, entregador.getCodigoAcesso());
 
+        try {
+            Associacao associacao = associacaoRepository.findByEstabelecimentoIdAndEntregadorId(estabelecimentoId,
+                    entregadorId);
+            associacao.setDisponibilidade(disponibilidade);
+            if (disponibilidade) {
+                estabelecimento.getEntregadoresDisponiveis().add(entregador);
+
+                if(!estabelecimento.getPedidosSemEntregador().isEmpty()) {   
+                    Pedido pedido = estabelecimento.getPedidosSemEntregador().remove(0);       
+                    pedidoService.atribuiEntregadorAutomaticamente(pedido);
+                }
+            } else {
+                estabelecimento.getEntregadoresDisponiveis().remove(entregador);
+            }
+            estabelecimentoRepository.flush();
+            associacaoRepository.flush();
+
+        } catch (Exception e) {
+            throw new AssociacaoNotFoundException();
+        }
+    }
 }

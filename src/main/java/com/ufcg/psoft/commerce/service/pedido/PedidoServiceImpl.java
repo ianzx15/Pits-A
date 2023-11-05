@@ -14,7 +14,7 @@ import com.ufcg.psoft.commerce.observer.NotificaSemEntregadoresDisp;
 import com.ufcg.psoft.commerce.repository.*;
 import com.ufcg.psoft.commerce.service.estabelecimento.EstabelecimentoService;
 
-import org.modelmapper.ModelMapper;
+import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ufcg.psoft.commerce.Util.Util;
@@ -361,7 +361,7 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
 
     }
 
-    private void atribuiEntregadorAutomaticamente(Pedido pedido) {
+    public void atribuiEntregadorAutomaticamente(Pedido pedido) {
         Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(pedido.getEstabelecimentoId(), estabelecimentoRepository);
 
         if (!estabelecimento.getEntregadoresDisponiveis().isEmpty()) {
@@ -376,6 +376,8 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
         } else {
             var cliente = RetornaEntidades.retornaCliente(pedido.getClienteId(), clienteRepository);
             notificaSemEntregadoresDisp.notificaSemEntregadoresDisp(cliente.getNome());
+            estabelecimento.getPedidosSemEntregador().add(pedido);
+            this.estabelecimentoRepository.flush();
         }
     }
 }

@@ -42,14 +42,13 @@ public class AssociacaoServiceImpl implements AssociacaoService {
     @Override
     public Associacao atualizar(Long entregadorId, String estabelecimentoCodigoAcesso, Long estabelecimentoId) {
         Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, estabelecimentoRepository);
-        Entregador entregador = RetornaEntidades.retornaEntregador(entregadorId, entregadorRepository);
+        RetornaEntidades.retornaEntregador(entregadorId, entregadorRepository);
 
         Util.verificaCodAcesso(estabelecimentoCodigoAcesso, estabelecimento.getCodigoAcesso());
 
         Associacao associacao = associacaoRepository.findByEstabelecimentoIdAndEntregadorId(estabelecimentoId, entregadorId);
 
         associacao.setStatus(true);
-        estabelecimento.getEntregadoresDisponiveis().add(entregador);
 
         associacaoRepository.flush();
         estabelecimentoRepository.flush();
