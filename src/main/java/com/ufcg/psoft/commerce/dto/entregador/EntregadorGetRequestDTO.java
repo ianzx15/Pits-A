@@ -34,12 +34,6 @@ public class EntregadorGetRequestDTO {
     @NotBlank
     private String corVeiculo;
 
-    @JsonProperty("statusAprovacao")
-    private boolean statusAprovacao;
-
-    @JsonProperty("disponilibidade")
-    private boolean disponibilidade;
-
     public EntregadorGetRequestDTO(Entregador entregador) {
         this.id = entregador.getId();
         this.nome = entregador.getNome();

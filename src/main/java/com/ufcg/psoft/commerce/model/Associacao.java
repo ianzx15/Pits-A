@@ -12,8 +12,8 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Associacao {
-    
-    @EmbeddedId 
+
+    @EmbeddedId
     @Builder.Default
     private AssociacaoKey id = new AssociacaoKey();
 
@@ -31,4 +31,7 @@ public class Associacao {
     @Builder.Default
     private Boolean status = false;
 
+    @Column(name = "disponibilidade")
+    @Builder.Default
+    private Boolean disponibilidade = false;
 }

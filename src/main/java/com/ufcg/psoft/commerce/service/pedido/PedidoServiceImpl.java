@@ -4,13 +4,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoEntregadorResponseDTO;
-import com.ufcg.psoft.commerce.exception.estabelecimento.EstabelecimentoCodAcessoException;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoProntoException;
 import com.ufcg.psoft.commerce.exception.pedido.SemEntregadoresDispException;
 import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.observer.NotificaEntregaPedido;
+import com.ufcg.psoft.commerce.observer.NotificaEntregador;
 import com.ufcg.psoft.commerce.observer.NotificaPedidoEmRota;
 import com.ufcg.psoft.commerce.repository.*;
+import com.ufcg.psoft.commerce.service.estabelecimento.EstabelecimentoService;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,13 @@ import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPertenceAEntidade;
 import com.ufcg.psoft.commerce.exception.pedido.PedidoNaoPodeSerCancelado;
 
 @Service
-public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, NotificaPedidoEmRota {
+public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, NotificaPedidoEmRota, NotificaEntregador {
 
     @Autowired
     ModelMapper modelMapper;
+
+    @Autowired
+    EstabelecimentoService estabelecimentoService;
 
     @Autowired
     PedidoRepository pedidoRepository;
@@ -284,17 +289,22 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
         pedido.setStatusEntrega("Pedido pronto");
         this.pedidoRepository.flush();
 
+        atribuiEntregadorAutomaticamente(pedido);
+
         return modelMapper.map(pedido, PedidoResponseDTO.class);
     }
 
     @Override
     public PedidoEntregadorResponseDTO atribuiEntregador(Long pedidoId, String estabelecimentoCodigoAcesso, Long estabelecimentoId) {
-        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, estabelecimentoRepository);
         Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
-
-        if (!estabelecimentoCodigoAcesso.equals(estabelecimento.getCodigoAcesso())) {
-            throw new EstabelecimentoCodAcessoException();
+        
+        if (pedido.getEstabelecimentoId() != estabelecimentoId) {
+            throw new PedidoNaoPertenceAEntidade("O pedido nao pertence ao estabelecimento!");
         }
+
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(estabelecimentoId, estabelecimentoRepository);
+        
+        Util.verificaCodAcesso(estabelecimentoCodigoAcesso , estabelecimento.getCodigoAcesso());
 
         if (!pedido.getStatusEntrega().equals("Pedido pronto")) {
             throw new PedidoNaoProntoException();
@@ -306,7 +316,6 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
 
         Entregador entregador = estabelecimento.getEntregadoresDisponiveis().get(0);
 
-        entregador.setStatusAprovacao(true);
         pedido.setEntregadorId(entregador.getId());
         pedido.setStatusEntrega("Pedido em rota");
         notificaEmRota(pedidoId, estabelecimentoId, entregador);
@@ -329,6 +338,11 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
     }
 
     @Override
+    public void notificaEntregador(Long pedidoId, Long entregadorId) {
+        System.out.println("Olá entregador " + entregadorId + ", o pedido " + pedidoId + " está disponível para entrega!");
+    }
+
+    @Override
     public void cancelarPedido(Long pedidoId, String clienteCodigoAcesso) {
         Pedido pedido = RetornaEntidades.retornaPedido(pedidoId, pedidoRepository);
         Cliente cliente = RetornaEntidades.retornaCliente(pedido.getClienteId(), clienteRepository);
@@ -343,4 +357,21 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
 
     }
 
+    public void atribuiEntregadorAutomaticamente(Pedido pedido) {
+        Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(pedido.getEstabelecimentoId(), estabelecimentoRepository);
+
+        if (!estabelecimento.getEntregadoresDisponiveis().isEmpty()) {
+            Entregador entregador = estabelecimento.getEntregadoresDisponiveis().remove(0);
+            estabelecimento.getEntregadoresDisponiveis().add(entregador);
+
+            pedido.setEntregadorId(entregador.getId());
+            pedido.setStatusEntrega("Pedido em rota");
+            notificaEntregador(pedido.getId(), pedido.getEntregadorId());
+
+            this.pedidoRepository.flush();
+        } else {
+            estabelecimento.getPedidosSemEntregador().add(pedido);
+            this.estabelecimentoRepository.flush();
+        }
+    }
 }

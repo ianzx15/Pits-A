@@ -49,4 +49,14 @@ public class EntregadorController {
         this.entregadorServices.delete(id, codigoAcesso);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Entregador Excluido");
     }
+
+    @PutMapping(value = "/{id}/disponibilidade")
+    @Transactional
+    public ResponseEntity<?> atualizaDisponibilidade(@PathVariable Long id,
+            @RequestParam Long estabelecimentoId,
+            @RequestParam Boolean disponibilidade,
+            @RequestParam String codigoAcesso) {
+        this.entregadorServices.atualizarDisponibilidade(id, estabelecimentoId, codigoAcesso, disponibilidade);
+        return ResponseEntity.ok().build();
+    }
 }
