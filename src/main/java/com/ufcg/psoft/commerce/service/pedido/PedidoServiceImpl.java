@@ -14,7 +14,7 @@ import com.ufcg.psoft.commerce.observer.NotificaSemEntregadoresDisp;
 import com.ufcg.psoft.commerce.repository.*;
 import com.ufcg.psoft.commerce.service.estabelecimento.EstabelecimentoService;
 
-import org.modelmapper.ModelMapper
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ufcg.psoft.commerce.Util.Util;
