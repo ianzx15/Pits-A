@@ -10,10 +10,11 @@ import com.ufcg.psoft.commerce.model.*;
 import com.ufcg.psoft.commerce.observer.NotificaEntregaPedido;
 import com.ufcg.psoft.commerce.observer.NotificaEntregador;
 import com.ufcg.psoft.commerce.observer.NotificaPedidoEmRota;
+import com.ufcg.psoft.commerce.observer.NotificaSemEntregadoresDisp;
 import com.ufcg.psoft.commerce.repository.*;
 import com.ufcg.psoft.commerce.service.estabelecimento.EstabelecimentoService;
 
-import org.modelmapper.ModelMapper;
+import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ufcg.psoft.commerce.Util.Util;
@@ -48,6 +49,9 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
 
     @Autowired
     EstabelecimentoRepository estabelecimentoRepository;
+
+    @Autowired
+    NotificaSemEntregadoresDisp notificaSemEntregadoresDisp;
 
     @Override
     public PedidoResponseDTO criar(Long clienteId, String clienteCodigoAcesso, Long estabelecimentoId,
@@ -370,6 +374,8 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
 
             this.pedidoRepository.flush();
         } else {
+            var cliente = RetornaEntidades.retornaCliente(pedido.getClienteId(), clienteRepository);
+            notificaSemEntregadoresDisp.notificaSemEntregadoresDisp(cliente.getNome());
             estabelecimento.getPedidosSemEntregador().add(pedido);
             this.estabelecimentoRepository.flush();
         }

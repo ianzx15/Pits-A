@@ -10,6 +10,7 @@ import com.ufcg.psoft.commerce.exception.sabor.SaborJaDisponivel;
 import com.ufcg.psoft.commerce.model.Cliente;
 import com.ufcg.psoft.commerce.model.Sabor;
 import com.ufcg.psoft.commerce.observer.NotificaDispSabor;
+import com.ufcg.psoft.commerce.observer.NotificaSemEntregadoresDisp;
 import com.ufcg.psoft.commerce.repository.ClienteRepository;
 import com.ufcg.psoft.commerce.repository.SaborRepository;
 
@@ -21,7 +22,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-public class ClienteServiceImpl implements ClienteService, NotificaDispSabor {
+public class ClienteServiceImpl implements ClienteService, NotificaDispSabor, NotificaSemEntregadoresDisp {
 
     @Autowired
     ClienteRepository clienteRepository;
@@ -90,5 +91,10 @@ public class ClienteServiceImpl implements ClienteService, NotificaDispSabor {
     @Override
     public void notificaDispSabor(String sabor, String nomeCliente) {
         System.out.println("Olá " + nomeCliente + ", o sabor " + sabor + " esta agora disponivel !");
+    }
+
+    @Override
+    public void notificaSemEntregadoresDisp(String nomeCliente) {
+        System.out.println("Olá " + nomeCliente + ", seu pedido nao saiu para entrega, pois nao ha entregadores disponiveis");
     }
 }
