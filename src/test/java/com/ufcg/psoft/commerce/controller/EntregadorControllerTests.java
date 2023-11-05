@@ -668,9 +668,7 @@ public class EntregadorControllerTests {
                             .contentType(MediaType.APPLICATION_JSON)
                             .param("estabelecimentoId", estabelecimento.getId().toString())
                             .param("codigoAcesso", entregador.getCodigoAcesso())
-                            .param("disponibilidade", "true")
-                            .content(objectMapper.writeValueAsString(
-                                    entregadorPostPutRequestDTO)))
+                            .param("disponibilidade", "true"))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
