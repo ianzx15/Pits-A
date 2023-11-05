@@ -39,8 +39,6 @@ public class EntregadorServices implements EntregadorServicesInterface {
     @Autowired
     private PedidoServiceImpl pedidoService;
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -104,14 +102,15 @@ public class EntregadorServices implements EntregadorServicesInterface {
             associacao.setDisponibilidade(disponibilidade);
             if (disponibilidade) {
                 estabelecimento.getEntregadoresDisponiveis().add(entregador);
-                estabelecimentoRepository.flush();
 
                 if(!estabelecimento.getPedidosSemEntregador().isEmpty()) {   
                     Pedido pedido = estabelecimento.getPedidosSemEntregador().remove(0);       
                     pedidoService.atribuiEntregadorAutomaticamente(pedido);
-                    estabelecimentoRepository.flush();
                 }
+            } else {
+                estabelecimento.getEntregadoresDisponiveis().remove(entregador);
             }
+            estabelecimentoRepository.flush();
             associacaoRepository.flush();
 
         } catch (Exception e) {

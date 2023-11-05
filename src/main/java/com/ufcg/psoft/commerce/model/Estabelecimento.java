@@ -32,7 +32,7 @@ public class Estabelecimento {
     private List<Associacao> associacoes;
 
     @JsonProperty("entregadores")
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Builder.Default

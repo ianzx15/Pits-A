@@ -13,6 +13,7 @@ import com.ufcg.psoft.commerce.model.Estabelecimento;
 import com.ufcg.psoft.commerce.repository.AssociacaoRepository;
 import com.ufcg.psoft.commerce.repository.EntregadorRepository;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
+import com.ufcg.psoft.commerce.service.entregador.EntregadorServices;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -637,6 +638,9 @@ public class EntregadorControllerTests {
         @Autowired
         AssociacaoRepository associacaoRepository;
 
+        @Autowired
+        EntregadorServices entregadorServices;
+
         Estabelecimento estabelecimento;
 
         @BeforeEach
@@ -691,6 +695,25 @@ public class EntregadorControllerTests {
                             .param("disponibilidade", "false")
                             .content(objectMapper.writeValueAsString(
                                     entregadorPostPutRequestDTO)))
+                    .andExpect(status().isOk())
+                    .andDo(print())
+                    .andReturn().getResponse().getContentAsString();
+
+            // Assert
+            assertFalse(estabelecimento.getEntregadoresDisponiveis().contains(entregador));
+        }
+
+        @Test
+        @DisplayName("Quando alteramos a disponibilidade do entregador para disponivel para indisponivel")
+        void quandoAlteramosDisponibilidadeDeDisponivelParaIndisponivel() throws Exception {
+            // Arrange
+            entregadorServices.atualizarDisponibilidade(entregador.getId(), estabelecimento.getId(), entregador.getCodigoAcesso(), true);
+            // Act
+            driver.perform(put(URI_ENTREGADORES + "/" + entregador.getId() + "/disponibilidade")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .param("estabelecimentoId", estabelecimento.getId().toString())
+                            .param("codigoAcesso", entregador.getCodigoAcesso())
+                            .param("disponibilidade", "false"))
                     .andExpect(status().isOk())
                     .andDo(print())
                     .andReturn().getResponse().getContentAsString();
