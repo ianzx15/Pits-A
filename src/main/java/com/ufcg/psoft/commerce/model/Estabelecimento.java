@@ -1,5 +1,6 @@
 package com.ufcg.psoft.commerce.model;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,4 +38,12 @@ public class Estabelecimento {
     @Builder.Default
     @JoinColumn(name = "entregadores")
     private List<Entregador> entregadoresDisponiveis = new LinkedList<>();
+
+    @JsonProperty("pedidos")
+    @OneToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    @JoinColumn(name = "pedidos")
+    private List<Pedido> pedidosSemEntregador = new ArrayList<Pedido>();
 }

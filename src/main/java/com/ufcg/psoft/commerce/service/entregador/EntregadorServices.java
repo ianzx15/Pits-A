@@ -9,9 +9,12 @@ import com.ufcg.psoft.commerce.exception.entregador.EntregadorNotFoundException;
 import com.ufcg.psoft.commerce.model.Associacao;
 import com.ufcg.psoft.commerce.model.Entregador;
 import com.ufcg.psoft.commerce.model.Estabelecimento;
+import com.ufcg.psoft.commerce.model.Pedido;
 import com.ufcg.psoft.commerce.repository.AssociacaoRepository;
 import com.ufcg.psoft.commerce.repository.EntregadorRepository;
 import com.ufcg.psoft.commerce.repository.EstabelecimentoRepository;
+import com.ufcg.psoft.commerce.repository.PedidoRepository;
+import com.ufcg.psoft.commerce.service.pedido.PedidoServiceImpl;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,12 @@ public class EntregadorServices implements EntregadorServicesInterface {
 
     @Autowired
     private EstabelecimentoRepository estabelecimentoRepository;
+
+    @Autowired
+    private PedidoServiceImpl pedidoService;
+
+    @Autowired
+    private PedidoRepository pedidoRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -96,6 +105,12 @@ public class EntregadorServices implements EntregadorServicesInterface {
             if (disponibilidade) {
                 estabelecimento.getEntregadoresDisponiveis().add(entregador);
                 estabelecimentoRepository.flush();
+
+                if(!estabelecimento.getPedidosSemEntregador().isEmpty()) {   
+                    Pedido pedido = estabelecimento.getPedidosSemEntregador().remove(0);       
+                    pedidoService.atribuiEntregadorAutomaticamente(pedido);
+                    estabelecimentoRepository.flush();
+                }
             }
             associacaoRepository.flush();
 

@@ -357,7 +357,7 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
 
     }
 
-    private void atribuiEntregadorAutomaticamente(Pedido pedido) {
+    public void atribuiEntregadorAutomaticamente(Pedido pedido) {
         Estabelecimento estabelecimento = RetornaEntidades.retornaEstabelecimento(pedido.getEstabelecimentoId(), estabelecimentoRepository);
 
         if (!estabelecimento.getEntregadoresDisponiveis().isEmpty()) {
@@ -369,6 +369,9 @@ public class PedidoServiceImpl implements PedidoService, NotificaEntregaPedido, 
             notificaEntregador(pedido.getId(), pedido.getEntregadorId());
 
             this.pedidoRepository.flush();
+        } else {
+            estabelecimento.getPedidosSemEntregador().add(pedido);
+            this.estabelecimentoRepository.flush();
         }
     }
 }
