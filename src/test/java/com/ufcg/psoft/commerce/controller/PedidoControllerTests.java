@@ -3,6 +3,7 @@ package com.ufcg.psoft.commerce.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ufcg.psoft.commerce.Util.RetornaEntidades;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoEntregadorResponseDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoPostPutRequestDTO;
 import com.ufcg.psoft.commerce.dto.pedido.PedidoResponseDTO;
@@ -1178,6 +1179,31 @@ public class PedidoControllerTests {
       assertAll(
           () -> assertTrue(estabelecimento.getPedidosSemEntregador().isEmpty()),
           () -> assertEquals(pedido.getEntregadorId(), entregador.getId()));
+    }
+
+    @Test
+    @DisplayName("Notifica cliente qaundo não há entregadores disponiveis")
+    void notificaClienteQuandoNaoHaEntregadoresDisponiveis() throws Exception {
+      // Arrange
+      pedidoRepository.save(pedido);
+      pedido.setStatusEntrega("Pedido em preparo");
+      estabelecimento.getEntregadoresDisponiveis().clear();
+      var cliente = RetornaEntidades.retornaCliente(pedido.getClienteId(), clienteRepository);
+
+      // Act
+      String responseJsonString = driver.perform(patch(URI_PEDIDOS + "/" + pedido.getId() + "/status-pedido/pronto")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(objectMapper.writeValueAsString(pedidoPostPutRequestDTO)))
+              .andExpect(status().isOk())
+              .andDo(print())
+              .andReturn().getResponse().getContentAsString();
+
+      PedidoResponseDTO resultado = objectMapper.readValue(responseJsonString,
+              PedidoResponseDTO.class);
+
+      // Assert
+      assertTrue(outputStreamCaptor.toString()
+              .trim().contains("Olá " + cliente.getNome() + ", seu pedido nao saiu para entrega, pois nao ha entregadores disponiveis"));
     }
   }
 }
